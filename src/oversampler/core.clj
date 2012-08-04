@@ -1,14 +1,62 @@
 (ns oversampler.core
-  (:use [overtone.live :only [sample-player load-sample buffer-data]]))
+  (:use [overtone.live :only [sample-player load-sample buffer-data buffer-info]]
+        [incanter core charts]))
 
 (defn -main
-  "I don't do a whole lot."
+  "Not sure what to do about this..."
   [& args]
-  (println "Hello, World!"))
+  (println "No commandline interface at this point."))
+
+(defn rms
+  "root mean square of sequence of floats."
+  [xs]
+  (Math/sqrt (reduce + (map #(* % %) xs))))
+
+(defn flast
+  "like ffirst"
+  [xs]
+  (nth (last xs) 0))
+
+(defn view-sample
+  "view the sample in an incanter line graph"
+  [path]
+  (let [the-buffer (load-sample path)
+        the-samples (buffer-data the-buffer)
+        num-parts 500 ; to not overload incanter
+        samples-per-part (int (/ (:n-samples (buffer-info the-buffer)) num-parts))
+        indexed-rms-per-part (map-indexed
+                              vector
+                              (map #(rms %) (partition samples-per-part the-samples)))
+        rms-dataset (dataset ["t" "rms"] indexed-rms-per-part)]
+    (view (area-chart
+           (sel rms-dataset :cols 0)
+           (sel rms-dataset :cols 1)
+           :x-label "Time" :y-label "RMS"))))
+;; (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
+
+(defn find-start-end-samples [path sample-names] ;; threshold? 
+  (let [the-buffer (load-sample path)
+        the-samples (buffer-data the-buffer)
+        sample-rate (:rate (buffer-info the-buffer))
+        nsamp (int (/ sample-rate 10)) ;; 10ms divisions
+        indexed-rms-10ms (map-indexed vector (map #(rms %) (partition nsamp the-samples)))
+        partitioned-rms (filter #(not (zero? (nth (first %) 1)))
+                                (partition-by #(zero? (nth % 1)) indexed-rms-10ms))
+        start-end-samples (map #(vector (* nsamp (dec (ffirst %)))
+                                        (* nsamp (inc (flast %))))
+                               partitioned-rms)]
+    (map #(apply vector %1 %2) sample-names start-end-samples)))
+
+#_(println (find-start-end-samples
+            "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"
+            ["A3" "A#3" "B4" "C4" "C#4" "D4" "D#4" "E4" "F4" "F#4" "G4" "G#4"]))
 
 (comment
 
-  ;; (use 'overtone.live :only [sample-player load-sample buffer-data])
+  ;; ???(require '[overtone.live :as 'o])
+  (use '[overtone.live :only [sample-player load-sample buffer-data buffer-info]])
+  (use '(incanter core charts))
+
 
 ??  (defn cello-samples
     {:name "A3"
@@ -27,8 +75,6 @@
     (Math/sqrt (reduce + (map #(* % %) xs))))
   
   (map #(rms %) (partition 22050 xd))
-
-  (use '(incanter core charts))
 
   (def x (load-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"))
   (def xd (buffer-data x))
@@ -50,20 +96,6 @@
 
   (view-nth xdidpn 0)
 
-  (defn flast [xs]
-    (nth (last xs) 0))
-  
-  (defn find-start-end-samples [path sample-names]
-    (let [nsamp 4410
-          samples (buffer-data (load-sample path))
-          rms-10ms (map-indexed vector (map #(rms %) (partition nsamp xd)))
-          partitioned-rms (filter #(not (zero? (nth (first %) 1)))
-                                  (partition-by #(zero? (nth % 1)) rms-10ms))
-          start-end-samples (map #(vector (* nsamp (dec (ffirst %)))
-                                          (* nsamp (inc (flast %))))
-                                 partitioned-rms)]
-      (map #(apply vector %1 %2) sample-names start-end-samples)))
-  
   (find-start-end-samples
    "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"
    ["A3" "A#3" "B4" "C4" "C#4" "D4" "D#4" "E4" "F4" "F#4" "G4" "G#4"])

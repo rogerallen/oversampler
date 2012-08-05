@@ -1,5 +1,6 @@
 (ns oversampler.core
-  (:use [overtone.live :only [sample-player load-sample buffer-data buffer-info]]
+  (:use [overtone.live :only [sample-player load-sample buffer-data buffer-info buffer buffer-write! hpf play-buf FREE bus->buf]]
+        [overtone.studio.util :only [bus->buf]]
         [incanter core charts]))
 
 (defn -main
@@ -17,21 +18,25 @@
   [xs]
   (nth (last xs) 0))
 
+;; ??? hmm, wonder if Incanter has rms-type algorithms I can use.
 (defn view-sample
   "view the sample in an incanter line graph"
   [path]
   (let [the-buffer (load-sample path)
         the-samples (buffer-data the-buffer)
         num-parts 500 ; to not overload incanter
-        samples-per-part (int (/ (:n-samples (buffer-info the-buffer)) num-parts))
+        samples-per-part (int (/ (:n-samples
+                                  (buffer-info the-buffer)) num-parts))
         indexed-rms-per-part (map-indexed
                               vector
-                              (map #(rms %) (partition samples-per-part the-samples)))
+                              (map #(rms %)
+                                   (partition samples-per-part the-samples)))
         rms-dataset (dataset ["t" "rms"] indexed-rms-per-part)]
     (view (area-chart
            (sel rms-dataset :cols 0)
            (sel rms-dataset :cols 1)
-           :x-label "Time" :y-label "RMS"))))
+           :x-label "samples"
+           :y-label "rms"))))
 ;; (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
 
 (defn find-start-end-samples [path sample-names] ;; threshold? 
@@ -51,10 +56,12 @@
             "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"
             ["A3" "A#3" "B4" "C4" "C#4" "D4" "D#4" "E4" "F4" "F#4" "G4" "G#4"]))
 
+;; ======================================================================
 (comment
 
   ;; ???(require '[overtone.live :as 'o])
-  (use '[overtone.live :only [sample-player load-sample buffer-data buffer-info]])
+  (use '[overtone.live :only [sample-player load-sample buffer-data buffer-info buffer buffer-write! hpf play-buf FREE]])
+  (use '[overtone.studio.util :only [bus->buf]])
   (use '(incanter core charts))
 
 
@@ -107,5 +114,23 @@
 
   (play-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" 2734200 2994390)
   
+(defn filter-this-sample [path]
+  (let [input-buffer (load-sample path)
+        input-buffer-info (buffer-info input-buffer)
+        output-buffer (buffer (:size input-buffer-info)
+                              (:n-channels input-buffer-info))
+        inter-bus (play-buf (:n-channels input-buffer-info)
+                             (:id input-buffer-info)
+                             (:rate-scale input-buffer-info)
+                             1.0 ; trigger
+                             0 ; start-pos
+                             0 ; loop
+                             FREE) ; action
+        hpf-bus (hpf inter-bus 15.0)
+        ]
+    (bus->buf hpf-bus output-buffer)
+    output-buffer))
 
+(def x (filter-this-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"))
+        
   )

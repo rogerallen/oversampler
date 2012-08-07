@@ -304,3 +304,22 @@
 {:index  81 :volume  0.30 :start  3832290 :end  4136580 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A4A5.mono.aif"}
    ])
 
+;; starting to follow the example of sampled_piano.clj...
+(defn get-mf-cello-samples
+  "return sequence of mf sample tuples for use in load-sample call"
+  []
+  (let [mf-info (filter #(= 0.5 (:volume %)) cello-sample-info-list)
+        mf-indexed (group-by :index mf-info)
+        unique-mf-info (map #(first (second %)) (sort mf-indexed))]
+    (map #(vector (:path %) :start (:start %) :size (- (:end %) (:start %)))
+         unique-mf-info)))
+
+(defonce cello-samples
+  (doall (map #(apply o/load-sample %) (get-mf-cello-samples))))
+
+(comment
+
+  ;; start-index (:index (first cello-sample-info-list))
+  ;; end-index (:index (last cello-sample-info-list))
+        
+)

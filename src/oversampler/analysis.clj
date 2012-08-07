@@ -116,11 +116,4 @@
            '[incanter.core :as ico]
            '[incanter.charts :as ich])
 
-  (defn play-sample [path samp-start samp-end]
-    (let [size (- samp-end samp-start)]
-      (sample-player
-       (load-sample path :start samp-start :size size))))
-  
-  (play-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" 2734200 2994390)
-
   )

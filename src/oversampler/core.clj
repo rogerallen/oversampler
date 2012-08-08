@@ -1,5 +1,5 @@
 (ns oversampler.core
-  (:use [oversampler analysis bank]))
+  (:use [oversampler analysis bank inst]))
 
 (defn -main
   "Not sure what to do about this..."
@@ -9,10 +9,10 @@
 ;; ======================================================================
 (comment
 
-  (use '[oversampler analysis bank])
+  (use '[oversampler analysis bank inst])
   (use 'overtone.live)
-  (use 'oversampler.analysis)
-  (use 'oversampler.bank)
+  ;;(use 'oversampler.analysis)
+  ;;(use 'oversampler.bank)
   
   ;; use this to create the information used by the sampler.
   (print-all-info cello-sample-paths)
@@ -32,5 +32,11 @@
   (sample-player (get-cello-sample (note :c3) 1.0) :vol 8)
   (sample-player (get-cello-sample (note :c3) 0.5) :vol 8)
   (sample-player (get-cello-sample (note :c3) 0.3) :vol 8)
+
+  ;; use the instrument
+  (do
+    (sampled-cello :note (note :c3))
+    (sampled-cello :note (note :e3))
+    (sampled-cello :note (note :g3)))
 
   )

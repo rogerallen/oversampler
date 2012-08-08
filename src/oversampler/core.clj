@@ -10,6 +10,9 @@
 (comment
 
   (use '[oversampler analysis bank])
+  (use 'overtone.live)
+  (use 'oversampler.analysis)
+  (use 'oversampler.bank)
   
   ;; use this to create the information used by the sampler.
   (print-all-info cello-sample-paths)
@@ -18,15 +21,16 @@
   (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
   (view-sample (nth (nth cello-sample-paths 3) 2))
 
-  ;; hear a sample
-  (o/sample-player (nth cello-samples 1) :vol 8)
-
+  ;; play a sample from a file
   (defn play-sample [path samp-start samp-end]
     (let [size (- samp-end samp-start)]
       (sample-player
        (load-sample path :start samp-start :size size))))
-  
   (play-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" 2734200 2994390)
-
   
+  ;; hear a sample from the loaded examples
+  (sample-player (get-cello-sample (note :c3) 1.0) :vol 8)
+  (sample-player (get-cello-sample (note :c3) 0.5) :vol 8)
+  (sample-player (get-cello-sample (note :c3) 0.3) :vol 8)
+
   )

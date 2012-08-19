@@ -20,6 +20,7 @@
   ;; use Incanter graphs to look over one of the samples
   (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
   (view-sample (nth (nth cello-sample-paths 3) 2))
+  (view-sample-info (get-cello-sample-info (note :c2) 1.0))
 
   ;; play a sample from a file
   (defn play-sample [path samp-start samp-end]

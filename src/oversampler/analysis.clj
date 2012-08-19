@@ -1,12 +1,18 @@
 (ns oversampler.analysis
   (:require [overtone.live :as o]
             [incanter.core :as ico]
-            [incanter.charts :as ich]))
+            [incanter.charts :as ich]
+            [oversampler.utils :as osu]))
 
 (defn rms
   "root mean square of sequence of floats."
   [xs]
   (Math/sqrt (reduce + (map #(* % %) xs))))
+
+(defn abss
+  "root mean square of sequence of floats."
+  [xs]
+  (reduce max (map #(Math/abs %) xs)))
 
 (defn flast
   "like ffirst"
@@ -25,25 +31,104 @@
         num-parts 500 ; to not overload incanter
         samples-per-part (int (/ (:n-samples
                                   (o/buffer-info the-buffer)) num-parts))
+        indexed-abs-per-part (map-indexed vector (map abss (partition samples-per-part the-samples)))
         ;;indexed-rms-per-part (map-indexed vector (map rms (partition samples-per-part the-samples)))
-        indexed-min-per-part (map-indexed vector
-                                          (map #(* 10 (apply min %)) (partition samples-per-part the-samples)))
-        indexed-max-per-part (map-indexed vector
-                                          (map #(* 10 (apply max %)) (partition samples-per-part the-samples)))
+        ;;indexed-min-per-part (map-indexed vector
+        ;;                                  (map #(* 10 (apply min %)) (partition samples-per-part the-samples)))
+        ;;indexed-max-per-part (map-indexed vector
+        ;;                                  (map #(* 10 (apply max %)) (partition samples-per-part the-samples)))
+        abs-dataset (ico/dataset ["t" "rms"] indexed-abs-per-part)]
         ;;rms-dataset (ico/dataset ["t" "rms"] indexed-rms-per-part)
-        min-dataset (ico/dataset ["t" "rms"] indexed-min-per-part)
-        max-dataset (ico/dataset ["t" "rms"] indexed-max-per-part)]
+        ;;min-dataset (ico/dataset ["t" "rms"] indexed-min-per-part)
+        ;;max-dataset (ico/dataset ["t" "rms"] indexed-max-per-part)]
     (doto (ich/xy-plot
            ;;(ico/sel rms-dataset :cols 0) (ico/sel rms-dataset :cols 1)
-           (ico/sel min-dataset :cols 0) (ico/sel min-dataset :cols 1)
+           (ico/sel abs-dataset :cols 0) (ico/sel abs-dataset :cols 1)
            :x-label "samples" :y-label "amp")
-      (ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
+      ;;(ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
       ico/view)
     ))
 ;; (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
 
+;; Grr...out of memory when trying to view the whole thing. Why? 
+(defn view-sample-histogram
+  "view the histogram of a sample"
+  [path]
+  (let [the-buffer (o/load-sample path)
+        the-samples (o/buffer-data the-buffer)
+        num-parts 500 ; to not overload incanter
+        samples-per-part (int (/ (:n-samples
+                                  (o/buffer-info the-buffer)) num-parts))
+        abs-per-part (map abss (partition samples-per-part the-samples))
+        ;the-dataset (ico/dataset ["abs"] (map 'Math/abs the-samples))]
+        the-dataset (ico/dataset ["x"] abs-per-part)]
+    (doto (ich/histogram (ico/sel the-dataset :col 0) :nbins 20)
+      (ico/view))))
+
+;; (require '[oversampler.utils :as osu])
+(defn get-sample-norm-cum-histogram
+  "do the histogram of a sample"
+  [path]
+  (let [the-buffer (o/load-sample path)
+        the-samples (o/buffer-data the-buffer)
+        num-parts 500 ; to not overload incanter
+        samples-per-part (int (/ (:n-samples
+                                  (o/buffer-info the-buffer)) num-parts))
+        abs-per-part (map abss (partition samples-per-part the-samples))
+        maxv (reduce max abs-per-part)
+        the-histo (osu/histogram abs-per-part (osu/bin-list 0.0 maxv 20))
+        the-cum-histo (osu/cum-histogram the-histo)
+        norm-cum-histo (osu/norm-cum-histogram the-cum-histo)]
+    norm-cum-histo))
+
+(defn view-sample-info
+  "view the sample in an incanter line graph.  returns the plot so you can add more lines"
+  [sample-info]
+  (let [the-buffer (:sample sample-info)
+        the-samples (o/buffer-data the-buffer)
+        num-parts 500 ; to not overload incanter
+        samples-per-part (int (/ (:n-samples
+                                  (o/buffer-info the-buffer)) num-parts))
+        indexed-min-per-part (map-indexed vector
+                                          (map #(* 10 (apply min %)) (partition samples-per-part the-samples)))
+        indexed-max-per-part (map-indexed vector
+                                          (map #(* 10 (apply max %)) (partition samples-per-part the-samples)))
+        min-dataset (ico/dataset ["t" "rms"] indexed-min-per-part)
+        max-dataset (ico/dataset ["t" "rms"] indexed-max-per-part)
+        the-plot (ich/xy-plot
+                  (ico/sel min-dataset :cols 0) (ico/sel min-dataset :cols 1)
+                  :x-label "samples" :y-label "amp")
+        ]
+      (ich/add-lines the-plot (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
+      (ico/view the-plot)
+      the-plot
+    ))
+
+(defn add-sample-info
+  "add the sample to the-plot"
+  [the-plot sample-info]
+  (let [the-buffer (:sample sample-info)
+        the-samples (o/buffer-data the-buffer)
+        num-parts 500 ; to not overload incanter
+        samples-per-part (int (/ (:n-samples
+                                  (o/buffer-info the-buffer)) num-parts))
+        indexed-min-per-part (map-indexed vector
+                                          (map #(* 10 (apply min %)) (partition samples-per-part the-samples)))
+        indexed-max-per-part (map-indexed vector
+                                          (map #(* 10 (apply max %)) (partition samples-per-part the-samples)))
+        min-dataset (ico/dataset ["t" "rms"] indexed-min-per-part)
+        max-dataset (ico/dataset ["t" "rms"] indexed-max-per-part)
+        ]
+      (ich/add-lines the-plot (ico/sel min-dataset :cols 0) (ico/sel min-dataset :cols 1))
+      (ich/add-lines the-plot (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
+      the-plot
+    ))
+
 ;; using the zeros between notes, divide up the samples into single notes
-(defn find-start-end-samples [path] ;; threshold? 
+(defn find-start-end-zeros
+  "given a path to a set of samples, divide the samples up into regions of sound.
+   return a [start-sample end-sample] tuple for each region of active sound"
+  [path]
   (let [the-buffer (o/load-sample path)
         the-samples (o/buffer-data the-buffer)
         sample-rate (:rate (o/buffer-info the-buffer))
@@ -55,6 +140,54 @@
                                         (* nsamp (inc (flast %))))
                                partitioned-rms)]
     start-end-samples))
+
+;; (ico/view
+;;   (ich/histogram
+;;     (ico/sel (ico/dataset ["x"] [1 2 3 4 5 1 2 4]) :col 0) :nbins 100))
+
+;; (require '[oversampler.utils :as osu])
+(defn get-percentile-value
+  "do the histogram of a sample, normalize it and return the peak value that is below the percentile"
+  [the-samples percentile]
+  (let [num-parts 500 ; to not overload incanter
+        samples-per-part (int (/ (count the-samples) num-parts))
+        abs-per-part (map abss (partition samples-per-part the-samples))
+        maxv (reduce max abs-per-part)
+        the-histo (osu/histogram abs-per-part (osu/bin-list 0.0 maxv 20))
+        the-cum-histo (osu/cum-histogram the-histo)
+        norm-cum-histo (osu/norm-cum-histogram the-cum-histo)]
+    (first (last (take-while #(< (second %) percentile) norm-cum-histo)))))
+
+(defn refine-start-end
+  [start-sample end-sample path]
+  (let [the-buffer (o/load-sample path)
+        the-samples (take (- end-sample start-sample)
+                          (drop (dec start-sample) (o/buffer-data the-buffer)))
+        ;;_ (println "count samp" (count the-samples))
+        sample-rate (:rate (o/buffer-info the-buffer))
+        nsamp (int (/ sample-rate 10)) ;; 10ms divisions
+        indexed-abs-10ms (map-indexed vector (map abss (partition nsamp the-samples)))
+        max-abs (reduce max (map second indexed-abs-10ms))
+        ;;_ (println "mabs" max-abs)
+        nintieth-abs (get-percentile-value the-samples 0.90)
+        ;;_ (println "90%abs" nintieth-abs)
+        first-midpoint-index (ffirst (drop-while #(< (second %) (* 0.5 nintieth-abs)) indexed-abs-10ms))
+        ;;_ (println "fmi" first-midpoint-index)
+        start-offset (* (max 0 (- first-midpoint-index 2)) nsamp)
+        ;; FIXME start of buffer could be a non-zero point.  blend in...
+        end-offset 0
+        ]
+    (vector (+ start-sample start-offset) (- end-sample end-offset))))
+
+(defn find-start-end-samples
+  "given a path to a set of samples, divide the samples up into regions of sound that
+   have a synchronized starting point."
+  [path] ;; threshold? 
+  (for [[sample-start sample-end] (find-start-end-zeros path)]
+    (do
+      ;;(println "SE" sample-start sample-end) (flush)
+      (refine-start-end sample-start sample-end path)
+      )))
 
 ;; NB download http://theremin.music.uiowa.edu/MIScello2012.html Cello.arco.mono.1644.1.zip
 ;;    and unzip into samples.
@@ -115,6 +248,7 @@
 
   (require '[overtone.live :as o]
            '[incanter.core :as ico]
-           '[incanter.charts :as ich])
+           '[incanter.charts :as ich]
+           '[oversampler.utils :as osu])
 
   )

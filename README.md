@@ -1,6 +1,6 @@
 # oversampler
 
-A Clojure library for playing music samples in the Overtone project.
+A Clojure library for adjusting & playing music samples in the Overtone project.
 
 ## TODO List
 
@@ -8,15 +8,19 @@ A Clojure library for playing music samples in the Overtone project.
       X analysis of samples, view samples
       X bank - to load samples for future use
       X inst - the instrument of course
-    O code is too "cello" centric.  Needs abstraction
-    O cello sounds not ready for playing yet
-      O alignment
-      O volume
+    / cello notes need some processing
+      X alignment
+        - C2 shows noise before initial attack, delaying start.  
+          found start point via midpoint of 90th percentile volume
+      O add fade-in/out from/to 0
+      O find normalized volume
+      ? make each same length?
     O upload cello sounds to freesound & adjust interface
+    O code is too "cello" centric.  Needs abstraction
 
 ## Usage
 
-Code is experimental & under development.  Use at your own risk.
+Code is under development.  Use at your own risk.
 
 Here are some things that you can do:
 

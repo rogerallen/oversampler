@@ -69,4 +69,11 @@
   (let [t (clamp 0.0 1.0 (/ (- x edge0) (- edge1 edge0)))]
     (* t t (- 3.0 (* 2.0 t)))))
 
-        
+(defn smoothpulse
+  "use smoothstep to transition from 0->1 between edge0->1 and 1->0 on
+   edge2->3"
+  [edge0 edge1 edge2 edge3 x]
+  (let [ss0 (smoothstep edge0 edge1 x)
+        ss1 (- 1.0 (smoothstep edge2 edge3 x))]
+    (* ss0 ss1)))
+

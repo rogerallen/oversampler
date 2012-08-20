@@ -52,3 +52,21 @@
            (flatten (map #(vector (first %)
                                   (float (/ (second %) max-val)))
                          cum-histo)))))
+
+;; ======================================================================
+;; smoothstep — perform Hermite interpolation between two values
+;; from http://www.opengl.org/sdk/docs/manglsl/xhtml/smoothstep.xml
+(defn- clamp
+  "clamp x to the range [minx,maxx]"
+  [minx maxx x]
+  (min (max x minx) maxx))
+
+(defn smoothstep
+  "smoothstep performs smooth Hermite interpolation between 0 and 1
+   when edge0 < x < edge1. This is useful in cases where a threshold
+   function with a smooth transition is desired."
+  [edge0 edge1 x]
+  (let [t (clamp 0.0 1.0 (/ (- x edge0) (- edge1 edge0)))]
+    (* t t (- 3.0 (* 2.0 t)))))
+
+        

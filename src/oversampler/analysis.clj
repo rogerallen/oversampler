@@ -139,7 +139,7 @@
         start-end-samples (map #(vector (* nsamp (dec (ffirst %)))
                                         (* nsamp (inc (flast %))))
                                partitioned-rms)]
-    start-end-samples))
+    (vector start-end-samples the-buffer)))
 
 ;; (ico/view
 ;;   (ich/histogram
@@ -147,7 +147,8 @@
 
 ;; (require '[oversampler.utils :as osu])
 (defn get-percentile-value
-  "do the histogram of a sample, normalize it and return the peak value that is below the percentile"
+  "do the histogram of a sample, normalize it and return the peak
+  value that is below the percentile"
   [the-samples percentile]
   (let [num-parts 500 ; to not overload incanter
         samples-per-part (int (/ (count the-samples) num-parts))
@@ -159,8 +160,13 @@
     (first (last (take-while #(< (second %) percentile) norm-cum-histo)))))
 
 (defn refine-start-end
-  [start-sample end-sample path]
-  (let [the-buffer (o/load-sample path)
+  "given some known start/end zero points, refine the sound selection
+  by finding the histogram of the values and some high percentile peak
+  value to use for both scaling the output and finding the midpoint to
+  start the sound.  Adjust the sound to start 2*10ms before that
+  midpoint.  Return a tuple of start/end/peak-pctile-value"
+  [the-buffer start-sample end-sample pctile path]
+  (let [;;the-buffer (o/load-sample path)
         the-samples (take (- end-sample start-sample)
                           (drop (dec start-sample) (o/buffer-data the-buffer)))
         ;;_ (println "count samp" (count the-samples))
@@ -169,25 +175,28 @@
         indexed-abs-10ms (map-indexed vector (map abss (partition nsamp the-samples)))
         max-abs (reduce max (map second indexed-abs-10ms))
         ;;_ (println "mabs" max-abs)
-        nintieth-abs (get-percentile-value the-samples 0.90)
-        ;;_ (println "90%abs" nintieth-abs)
-        first-midpoint-index (ffirst (drop-while #(< (second %) (* 0.5 nintieth-abs)) indexed-abs-10ms))
+        pctile-peak-val (get-percentile-value the-samples pctile)
+        ;;_ (println "90%abs" pctile-peak-val)
+        first-midpoint-index (ffirst (drop-while #(< (second %) (* 0.5 pctile-peak-val)) indexed-abs-10ms))
         ;;_ (println "fmi" first-midpoint-index)
         start-offset (* (max 0 (- first-midpoint-index 2)) nsamp)
-        ;; FIXME start of buffer could be a non-zero point.  blend in...
-        end-offset 0
+        end-offset 0 ;; not adjusting the end, yet.
         ]
-    (vector (+ start-sample start-offset) (- end-sample end-offset))))
+    (vector (+ start-sample start-offset)
+            (- end-sample end-offset)
+            pctile-peak-val)))
 
-(defn find-start-end-samples
-  "given a path to a set of samples, divide the samples up into regions of sound that
-   have a synchronized starting point."
-  [path] ;; threshold? 
-  (for [[sample-start sample-end] (find-start-end-zeros path)]
-    (do
-      ;;(println "SE" sample-start sample-end) (flush)
-      (refine-start-end sample-start sample-end path)
-      )))
+(defn find-start-end-ppeak-samples
+  "given a path to a set of samples, divide the samples up into
+   regions of sound that have a synchronized starting point.  Also
+   return the 90th percentile peak abs value of the sound."
+  [path]
+  (let [[start-end-sample-map the-buffer] (find-start-end-zeros path)]
+    (for [[sample-start sample-end] start-end-sample-map]
+      (do
+        ;;(println "SE" sample-start sample-end) (flush)
+        (refine-start-end the-buffer sample-start sample-end 0.90 path)
+        ))))
 
 ;; NB download http://theremin.music.uiowa.edu/MIScello2012.html Cello.arco.mono.1644.1.zip
 ;;    and unzip into samples.
@@ -232,13 +241,13 @@
 
 (defn print-all-info [paths]
   (doseq [[cur-idx cur-vol cur-path] paths]
-    (let [ses (find-start-end-samples cur-path)]
-      ;;(println (count ses) cur-idx cur-path)
+    (let [ses (find-start-end-ppeak-samples cur-path)]
+      (println (format ";; %d samples starting at %d. %s" (count ses) cur-idx cur-path))
       (dotimes [i (count ses)]
-        (let [[st en] (nth ses i)
+        (let [[st en pk] (nth ses i)
               idx (+ cur-idx i)]
-          (println (format "{:index %3d :volume %5.2f :start %8d :end %8d :path \"%s\"}"
-                           idx cur-vol st en cur-path)))))))
+          (println (format "{:index %3d :volume %5.2f :start %8d :end %8d :ppeak %6.4f :path \"%s\"}"
+                           idx cur-vol st en pk cur-path)))))))
 
 ;; use this to create the information used by the sampler.
 ;; (print-all-info cello-sample-paths)

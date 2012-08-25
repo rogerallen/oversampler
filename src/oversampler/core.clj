@@ -15,7 +15,7 @@
   ;;(use 'oversampler.bank)
   
   ;; use this to create the information used by the sampler.
-  (print-all-info cello-sample-paths)
+  (print-sample-file-info cello-sample-paths)
 
   ;; use Incanter graphs to look over one of the samples
   (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")

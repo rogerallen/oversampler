@@ -342,9 +342,9 @@
 (defn- get-cello-sample-info-map
   "return map of sample-info. map key is :index"
   []
-  (let [unique-pp-info (get-unique-cello-sample-info-map 0.3)
-        unique-mf-info (get-unique-cello-sample-info-map 0.5)
-        unique-ff-info (get-unique-cello-sample-info-map 1.0)
+  (let [unique-pp-info (get-unique-cello-sample-info-map 0.15)
+        unique-mf-info (get-unique-cello-sample-info-map 0.30)
+        unique-ff-info (get-unique-cello-sample-info-map 0.5)
         sample-info-map (merge-with concat unique-pp-info unique-mf-info unique-ff-info)]
     sample-info-map))
 
@@ -379,19 +379,21 @@
   "given an info map of the sample, load & add the sample"
   [x]
   (let [the-size (- (:end x) (:start x))
-        _ (println "load sample..." (:end x) (:start x) (:path x))
+        ;; _ (println "load sample..." (:end x) (:start x) (:path x))
         the-buffer (o/load-sample (:path x) :start (:start x) :size the-size)
-        sample-rate (:rate (o/buffer-info the-buffer))
-        sample-offset (int (* 2 (/ sample-rate 10)))
-        ;; adjust the samples to have a smooth start & end.  
-        _ (println "process sample")
-        the-samples (map-indexed #(adjust-sample sample-offset the-size (:volume x) (:ppeak x) %1 %2) (o/buffer-data the-buffer))
-        _ (println "write sample")
-        _ (buffer-write-relay! the-buffer the-samples)
-        _ (println "done.")
+        ;; this is an interesting idea, but takes WAAY too long.  Going to try either:
+        ;; 1) envelope to accomplish the same
+        ;; 2) prepare these samples into files
+        ;; sample-rate (:rate (o/buffer-info the-buffer))
+        ;; sample-offset (int (* 2 (/ sample-rate 10)))
+        ;; ;; adjust the samples to have a smooth start & end.  
+        ;; _ (println "process sample")
+        ;; the-samples (map-indexed #(adjust-sample sample-offset the-size (:volume x) (:ppeak x) %1 %2) (o/buffer-data the-buffer))
+        ;; _ (println "write sample")
+        ;; _ (buffer-write-relay! the-buffer the-samples)
+        ;; _ (println "done.")
         ]
     (assoc x :sample the-buffer)))
-;; FIXME -- load sample, get raw data, process data & rewrite here.
 
 (defn- load-samples-into-infos
   "given a key value tuple where the value is an array of sample-info, load samples"
@@ -405,14 +407,14 @@
 (defonce min-cello-index (apply min (keys cello-sample-info-map)))
 (defonce max-cello-index (apply max (keys cello-sample-info-map)))
 
-;; FIXME -- only gets the precise volume 1.0, 0.5, or 0.3
-;; FIXME -- add version that provides 2 versions to blend between
-(defn get-cello-sample
-  ([i] (get-cello-sample i 1.0))
-  ([i v]
-     (if (or (>= i min-cello-index) (<= i max-cello-index))
-       (:sample (first (filter #(= v (:volume %)) (cello-sample-info-map i))))
-       nil)))
+;; FIXME -- only gets the precise volume.  select closest or blend between
+;; ??
+;;(defn get-cello-sample
+;;  ([i] (get-cello-sample i 0.5))
+;;  ([i v]
+;;     (if (or (>= i min-cello-index) (<= i max-cello-index))
+;;       (:sample (first (filter #(= v (:volume %)) (cello-sample-info-map i))))
+;;       nil)))
 
 (defn get-cello-sample-info
   ([i v]
@@ -421,12 +423,12 @@
        nil)))
 
 (defn get-cello-sample
-  ([i] (get-cello-sample i 1.0))
+  ([i] (get-cello-sample i 0.5))
   ([i v]
      (let [sample-info (get-cello-sample-info i v)]
        (if sample-info
-       (:sample sample-info)
-       nil))))
+         (:sample sample-info)
+         nil))))
 
 (comment
 

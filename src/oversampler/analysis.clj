@@ -239,7 +239,7 @@
    [ (o/note :c3) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulC.C3C4.mono.aif"]
    ])
 
-(defn print-all-info [paths]
+(defn print-sample-file-info [paths]
   (doseq [[cur-idx cur-vol cur-path] paths]
     (let [ses (find-start-end-ppeak-samples cur-path)]
       (println (format ";; %d samples starting at %d. %s" (count ses) cur-idx cur-path))
@@ -250,7 +250,7 @@
                            idx cur-vol st en pk cur-path)))))))
 
 ;; use this to create the information used by the sampler.
-;; (print-all-info cello-sample-paths)
+;; (print-sample-file-info cello-sample-paths)
 
 ;; ======================================================================
 (comment

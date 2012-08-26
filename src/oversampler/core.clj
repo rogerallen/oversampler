@@ -1,6 +1,8 @@
 (ns oversampler.core
   (:use [oversampler analysis]
-        [oversampler.cello bank inst]))
+        [oversampler.cello.inst])
+  (:require [oversampler.cello.raw :as cello.raw]
+            [oversampler.cello.bank :as cello.bank]))
 
 (defn -main
   "Not sure what to do about this..."
@@ -10,18 +12,20 @@
 ;; ======================================================================
 (comment
 
-  (use '[oversampler analysis bank inst])
+  (use 'oversampler analysis)
+  (use 'oversampler.cello.inst)
   (use 'overtone.live)
-  ;;(use 'oversampler.analysis)
-  ;;(use 'oversampler.bank)
+
+  (require '[oversampler.cello.raw :as cello.raw])
+  (require '[oversampler.cello.bank :as cello.bank])
   
   ;; use this to create the information used by the sampler.
-  (print-sample-file-info cello-sample-paths)
+  (print-sample-file-info cello.raw/sample-paths)
 
   ;; use Incanter graphs to look over one of the samples
   (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
-  (view-sample (nth (nth cello-sample-paths 3) 2))
-  (view-sample-info (get-cello-sample-info (note :c2) *cello-ff*))
+  (view-sample (nth (nth cello.raw/sample-paths 3) 2))
+  (view-sample-info (cello.bank/get-sample-info (note :c2) cello.raw/ff))
 
   ;; play a sample from a file
   (defn play-sample [path samp-start samp-end]
@@ -31,9 +35,9 @@
   (play-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" 2734200 2994390)
   
   ;; hear a sample from the loaded examples
-  (sample-player (get-cello-sample (note :c3) *cello-ff*) :vol 1.0)
-  (sample-player (get-cello-sample (note :c3) *cello-mf*) :vol 1.0)
-  (sample-player (get-cello-sample (note :c3) *cello-pp*) :vol 1.0)
+  (sample-player (cello.bank/get-sample (note :c3) cello.raw/ff) :vol 1.0)
+  (sample-player (cello.bank/get-sample (note :c3) cello.raw/mf) :vol 1.0)
+  (sample-player (cello.bank/get-sample (note :c3) cello.raw/pp) :vol 1.0)
 
   ;; use the instrument
   (do

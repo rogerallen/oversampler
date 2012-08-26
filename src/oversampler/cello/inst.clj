@@ -1,13 +1,11 @@
-(ns oversampler.inst
+(ns oversampler.cello.inst
   (:require [overtone.live :as o]
-            [oversampler.bank :as bank]))
+            [oversampler.cello.bank :as bank]))
 
-;; ??? should these buffers be part of oversampler.bank?
-
-;; Silent buffer used to fill in the gaps.
+;; Silent buffer used to fill in for any missing notes
 (defonce ^:private silent-buffer (o/buffer 0))
 
-(defn set-buffer-indices
+(defn- set-buffer-indices
   [buf offset volume]
   (dotimes [i 128]
     (if (bank/get-cello-sample i volume)
@@ -22,7 +20,7 @@
     (set-buffer-indices buf 256 bank/cello-ff)
     buf))
 
-(defn set-buffer-scaling-factors
+(defn- set-buffer-scaling-factors
   [buf offset volume]
   (dotimes [i 128]
     (if (bank/get-cello-sample i volume)
@@ -37,7 +35,7 @@
     (set-buffer-scaling-factors buf 256 bank/cello-ff)
     buf))
 
-(defn set-buffer-lengths
+(defn- set-buffer-lengths
   [buf offset volume]
   (dotimes [i 128]
     (if (bank/get-cello-sample i volume)

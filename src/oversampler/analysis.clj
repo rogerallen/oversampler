@@ -198,47 +198,6 @@
         (refine-start-end the-buffer sample-start sample-end 0.90 path)
         ))))
 
-;; NB download http://theremin.music.uiowa.edu/MIScello2012.html Cello.arco.mono.1644.1.zip
-;;    and unzip into samples.
-;; TBD upload to freesound.
-;;
-;; 2222222 3333333 4444444 5555555
-;; cdefgab cdefgab cdefgab cdefgab
-;;              aa aaaaaaa aaaaaa
-;;          dddddd ddddddd dd
-;;     ggg ggggggg ggggg
-;; ccccccc ccccccc c
-(def cello-sample-paths
-  ;; tuple of starting-index, volume(ish), and path(FIXME freesound id)
-  [
-   [ (o/note :a3) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"]
-   [ (o/note :a4) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulA.A4A5.mono.aif"]
-   [ (o/note :d3) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif"]
-   [ (o/note :d4) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulD.D4D5.mono.aif"]
-   [ (o/note :g2) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif"]
-   [ (o/note :g3) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulG.G3D4.mono.aif"]
-   [ (o/note :c2) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif"]
-   [ (o/note :c3) 0.50 "./src/oversampler/samples/Cello.arco.ff.sulC.C2D3.mono.aif"] ;; broken name?
-   
-   [ (o/note :a3) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif"]
-   [ (o/note :a4) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulA.A4A5.mono.aif"]
-   [ (o/note :d3) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif"]
-   [ (o/note :d4) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulD.D4D5.mono.aif"]
-   [ (o/note :g2) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif"]
-   [ (o/note :g3) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulG.G3G4.mono.aif"]
-   [ (o/note :c2) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif"]
-   [ (o/note :c3) 0.25 "./src/oversampler/samples/Cello.arco.mf.sulC.C3C4.mono.aif"]
-
-   [ (o/note :a3) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif"]
-   [ (o/note :a4) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulA.A4A5.mono.aif"]
-   [ (o/note :d3) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif"]
-   [ (o/note :d4) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulD.D4D5.mono.aif"]
-   [ (o/note :g2) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif"]
-   [ (o/note :g3) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulG.G3G4.mono.aif"]
-   [ (o/note :c2) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif"]
-   [ (o/note :c3) 0.15 "./src/oversampler/samples/Cello.arco.pp.sulC.C3C4.mono.aif"]
-   ])
-
 (defn print-sample-file-info [paths]
   (doseq [[cur-idx cur-vol cur-path] paths]
     (let [ses (find-start-end-ppeak-samples cur-path)]

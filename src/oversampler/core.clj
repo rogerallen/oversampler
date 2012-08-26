@@ -1,5 +1,6 @@
 (ns oversampler.core
-  (:use [oversampler analysis bank inst]))
+  (:use [oversampler analysis]
+        [oversampler.cello bank inst]))
 
 (defn -main
   "Not sure what to do about this..."

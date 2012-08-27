@@ -1,4 +1,5 @@
-(ns oversampler.cello.raw)
+(ns oversampler.cello.raw
+  (:require [overtone.live :as o]))
 
 ;; volume values that the raw values are "close" to and we can normalize to these.  FIXME may need "input" and "output" versions.
 (def ff 0.50)

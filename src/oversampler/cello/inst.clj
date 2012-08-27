@@ -1,5 +1,6 @@
 (ns oversampler.cello.inst
   (:require [overtone.live :as o]
+            [oversampler.cello.raw :as raw]
             [oversampler.cello.bank :as bank]))
 
 ;; Silent buffer used to fill in for any missing notes
@@ -8,38 +9,38 @@
 (defn- set-buffer-indices
   [buf offset volume]
   (dotimes [i 128]
-    (if (bank/get-cello-sample i volume)
-      (o/buffer-set! buf (+ offset i) (:id (bank/get-cello-sample i volume))))))
+    (if (bank/get-sample i volume)
+      (o/buffer-set! buf (+ offset i) (:id (bank/get-sample i volume))))))
 
 ;; buffer of buffer ids for instrument note ctl to index through
 (defonce ^:private index-buffer
   (let [buf (o/buffer (* 3 128))]
     (o/buffer-fill! buf (:id silent-buffer))
-    (set-buffer-indices buf 0 bank/cello-pp)
-    (set-buffer-indices buf 128 bank/cello-mf)
-    (set-buffer-indices buf 256 bank/cello-ff)
+    (set-buffer-indices buf 0 raw/pp)
+    (set-buffer-indices buf 128 raw/mf)
+    (set-buffer-indices buf 256 raw/ff)
     buf))
 
 (defn- set-buffer-scaling-factors
   [buf offset volume]
   (dotimes [i 128]
-    (if (bank/get-cello-sample i volume)
-      (o/buffer-set! buf (+ offset i) (/ 1.0 (:ppeak (bank/get-cello-sample-info i volume))))))) ;; ???
+    (if (bank/get-sample i volume)
+      (o/buffer-set! buf (+ offset i) (/ 1.0 (:ppeak (bank/get-sample-info i volume))))))) ;; ???
 
 ;; buffer of scaling values for note ctl to index through
 (defonce ^:private sample-scale-buffer
   (let [buf (o/buffer (* 3 128))]
     (o/buffer-fill! buf 1.0)
-    (set-buffer-scaling-factors buf 0 bank/cello-pp)
-    (set-buffer-scaling-factors buf 128 bank/cello-mf)
-    (set-buffer-scaling-factors buf 256 bank/cello-ff)
+    (set-buffer-scaling-factors buf 0 raw/pp)
+    (set-buffer-scaling-factors buf 128 raw/mf)
+    (set-buffer-scaling-factors buf 256 raw/ff)
     buf))
 
 (defn- set-buffer-lengths
   [buf offset volume]
   (dotimes [i 128]
-    (if (bank/get-cello-sample i volume)
-      (let [the-info (bank/get-cello-sample-info i volume)
+    (if (bank/get-sample i volume)
+      (let [the-info (bank/get-sample-info i volume)
             the-length (- (:end the-info) (:start the-info))]
         (o/buffer-set! buf (+ offset i)
                        (/ (- the-length (* 4 4410)) 44100.0)))))) ;; FIXME for non-44.1kHz
@@ -49,15 +50,15 @@
 (defonce ^:private sample-length-buffer
   (let [buf (o/buffer (* 3 128))]
     (o/buffer-fill! buf 0.0)
-    (set-buffer-lengths buf 0 bank/cello-pp)
-    (set-buffer-lengths buf 128 bank/cello-mf)
-    (set-buffer-lengths buf 256 bank/cello-ff)
+    (set-buffer-lengths buf 0 raw/pp)
+    (set-buffer-lengths buf 128 raw/mf)
+    (set-buffer-lengths buf 256 raw/ff)
     buf))
 
 ;; the sampled-cello instrument
 (o/definst sampled-cello
   [note 60 level 1 rate 1 loop? 0
-   attack 0 decay 1 sustain 1 release 0.1 curve -4 gate 1]
+   attack 0 decay 1 sustain 1 release 0.2 curve -4 gate 1]
   (let [ofst (* 128 (o/floor (* 3 (o/frac level)))) ;; select pp/mf/ff samples FIXME 1.0
         buf (o/index:kr (:id index-buffer) (+ ofst note))
         the-sample-scale (o/index:kr (:id sample-scale-buffer) (+ ofst note))

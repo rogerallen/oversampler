@@ -59,7 +59,7 @@
           _ (metro-start m 0)] 
       (dotimes [i (count notes)]
         (let [nx (at (m i) (the-inst :note (note (notes i)) :level level))]
-          (at (m (+ i 0.75)) (ctl nx :gate 0))))))
+          (at (m (+ i 0.95)) (ctl nx :gate 0))))))
   (song m sampled-cello 0.5)
   
   )

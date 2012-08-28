@@ -46,20 +46,47 @@
     (sampled-cello :note (note :g3) :level 0.5))
 
   ;; play song
-  (def m (metronome 60))
-  (defn song [m the-inst level]
-    (let [notes [:b3 :a3 :g3 :a3
-                 :b3 :b3 :b3 :b3
-                 :a3 :a3 :a3 :a3
-                 :b3 :d4 :d4 :d4
-                 :b3 :a3 :g3 :a3
-                 :b3 :b3 :b3 :b3
-                 :a3 :a3 :b3 :a3
-                 :g3 :g3 :g3 :g3]
-          _ (metro-start m 0)] 
-      (dotimes [i (count notes)]
-        (let [nx (at (m i) (the-inst :note (note (notes i)) :level level))]
-          (at (m (+ i 0.95)) (ctl nx :gate 0))))))
-  (song m sampled-cello 0.5)
+  (defn play-song [the-inst level m notes]
+    (dotimes [i (count notes)]
+      (let [nx (at (m i) (the-inst :note (note (notes i)) :level level))]
+        (at (m (+ i 0.95)) (ctl nx :gate 0)))))
+  
+  (defn mary [the-inst level]
+    (let [m (metronome 72)
+          notes [:b2 :a2 :g2 :a2
+                 :b2 :b2 :b2 :b2
+                 :a2 :a2 :a2 :a2
+                 :b2 :d3 :d3 :d3
+                 :b2 :a2 :g2 :a2
+                 :b2 :b2 :b2 :b2
+                 :a2 :a2 :b2 :a2
+                 :g2 :g2 :g2 :g2]]
+      (play-song the-inst level m notes)))
+
+  (mary sampled-cello 0.5)
+  
+  (defn full-scale [the-inst level]
+    (let [m (metronome 180)
+          notes [:c2 :c#2 :d2 :d#2 :e2 :f2 :f#2 :g2 :g#2 :a2 :a#2 :b2
+                 :c3 :c#3 :d3 :d#3 :e3 :f3 :f#3 :g3 :g#3 :a3 :a#3 :b3
+                 :c4 :c#4 :d4 :d#4 :e4 :f4 :f#4 :g4 :g#4 :a4 :a#4 :b4
+                 :c5 :c#5 :d5 :d#5 :e5 :f5 :f#5 :g5 :g#5 :a5 :a#5 :b5
+                 ]]
+      (play-song the-inst level m notes)))
+
+  (full-scale sampled-cello 0.5)
+  
+  (defn bach-pre-1 [the-inst level]
+    (let [m (metronome 240)
+          notes [:g2 :d3  :b3 :a3 :b3 :d3  :b3 :d3
+                 :g2 :d3  :b3 :a3 :b3 :d3  :b3 :d3
+                 :g2 :e3  :c4 :b3 :c4 :e3  :c4 :e3
+                 :g2 :e3  :c4 :b3 :c4 :e3  :c4 :e3
+                 :g2 :f#3 :c4 :b3 :c4 :f#3 :c4 :f#3
+                 :g2 :f#3 :c4 :b3 :c4 :f#3 :c4 :f#3
+                 ]]
+      (play-song the-inst level m notes)))
+
+  (bach-pre-1 sampled-cello 0.5)
   
   )

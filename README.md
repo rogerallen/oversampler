@@ -16,9 +16,9 @@ A Clojure library for adjusting & playing music samples in the Overtone project.
       X find normalized volume
       ? make each same length?    
     X code is too "cello" centric.
+    X upload cello sounds to freesound & adjust interface
+    O fix so volume is not discreet in 3 steps
     O cello sounds need a good ear to listen/critique/adjust
-    O upload cello sounds to freesound & adjust interface
-    O may need abstraction
     O needs better docs
 
 ## Usage

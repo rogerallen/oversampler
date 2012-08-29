@@ -13,8 +13,8 @@
 (comment
 
   (use 'oversampler analysis)
-  (use 'oversampler.cello.inst)
   (use 'overtone.live)
+  (use 'oversampler.cello.inst)
 
   (require '[oversampler.cello.raw :as cello.raw])
   (require '[oversampler.cello.bank :as cello.bank])
@@ -49,7 +49,7 @@
   (defn play-song [the-inst level m notes]
     (dotimes [i (count notes)]
       (let [nx (at (m i) (the-inst :note (note (notes i)) :level level))]
-        (at (m (+ i 0.95)) (ctl nx :gate 0)))))
+        (at (m (+ i 0.75)) (ctl nx :gate 0)))))
   
   (defn mary [the-inst level]
     (let [m (metronome 72)
@@ -76,6 +76,11 @@
 
   (full-scale sampled-cello 0.5)
   
+  (defn c-scale [the-inst level]
+    (let [m (metronome 180)
+          notes [:c2 :d2 :e2 :f2 :g2 :a2 :b2]]
+      (play-song the-inst level m notes)))
+
   (defn bach-pre-1 [the-inst level]
     (let [m (metronome 240)
           notes [:g2 :d3  :b3 :a3 :b3 :d3  :b3 :d3
@@ -88,5 +93,27 @@
       (play-song the-inst level m notes)))
 
   (bach-pre-1 sampled-cello 0.5)
-  
+
+  ;; test to get levels right
+  (defn test-levels [the-level]
+    (demo 1 (* the-level (sin-osc [440 440])))
+    (Thread/sleep 1000)
+    (c-scale sampled-cello the-level)
+    (Thread/sleep 3000))
+
+  (defn record-testing []
+    (recording-start "~/cello-test.wav")
+    (demo 1 (* 1.0 (sin-osc [440 440])))
+    (Thread/sleep 1000)
+    (demo 1 (* 0.5 (sin-osc [440 440])))
+    (Thread/sleep 1000)
+    (demo 1 (* 0.25 (sin-osc [440 440])))
+    (Thread/sleep 1000)
+    (test-levels 0.8)
+    (test-levels 0.4)
+    (test-levels 0.2)
+    (recording-stop)
+    )
+
+    (record-testing)
   )

@@ -3,6 +3,7 @@
             [oversampler.cello.raw :as raw]
             [oversampler.cello.bank :as bank]))
 
+
 ;; Silent buffer used to fill in for any missing notes
 (defonce ^:private silent-buffer (o/buffer 0))
 
@@ -25,7 +26,7 @@
   [buf offset volume]
   (dotimes [i 128]
     (if (bank/get-sample i volume)
-      (o/buffer-set! buf (+ offset i) (/ 1.0 (:ppeak (bank/get-sample-info i volume))))))) ;; ???
+      (o/buffer-set! buf (+ offset i) (/ 2.0 (:ppeak (bank/get-sample-info i volume))))))) ;; ???
 
 ;; buffer of scaling values for note ctl to index through
 (defonce ^:private sample-scale-buffer
@@ -44,7 +45,6 @@
             the-length (- (:end the-info) (:start the-info))]
         (o/buffer-set! buf (+ offset i)
                        (/ (- the-length (* 4 4410)) 44100.0)))))) ;; FIXME for non-44.1kHz
-
    
 ;; buffer of sample-lengths for note ctl to index through
 (defonce ^:private sample-length-buffer

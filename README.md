@@ -25,10 +25,7 @@ A Clojure library for adjusting & playing music samples in the Overtone project.
 
 Code is under development.  Use at your own risk.
 
-See core.clj for latest things you can do with the code.
-
-Be sure that first you download http://theremin.music.uiowa.edu/MIScello2012.html
-Cello.arco.mono.1644.1.zip and unzip into the src/oversampler/samples directory.
+For now, see core.clj comments for things you can do with the code.
 
 ## License
 

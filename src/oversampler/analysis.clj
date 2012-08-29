@@ -1,3 +1,14 @@
+;;
+;; code for the analysis of raw input files for the purpose of creating meta information to use when
+;; partitioning the raw input into sound banks and controlling the playback of the information.
+;;
+;; the code is a bit "ad hoc" at the moment since I've only worked on one set of samples.
+;;
+;; goal of this code is to use this to create the information used by the sampler.
+;; (print-sample-file-info cello-sample-paths)
+;; then take that output & use it in cello/bank.clj
+;; hopefully this will also work for other instruments & not just the cello.
+;;
 (ns oversampler.analysis
   (:require [overtone.live :as o]
             [incanter.core :as ico]
@@ -207,9 +218,6 @@
               idx (+ cur-idx i)]
           (println (format "{:index %3d :volume %5.2f :start %8d :end %8d :ppeak %6.4f :path \"%s\"}"
                            idx cur-vol st en pk cur-path)))))))
-
-;; use this to create the information used by the sampler.
-;; (print-sample-file-info cello-sample-paths)
 
 ;; ======================================================================
 (comment

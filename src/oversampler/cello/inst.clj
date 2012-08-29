@@ -1,11 +1,23 @@
+;;
+;; the sampled cello instrument
+;;
+;; to use:
+;;   (use 'overtone.live)
+;;   (use 'oversampler.cello.inst)
+;;   (sampled-cello :note 50 :level 0.2) ;; pp sample
+;;   (sampled-cello :note 50 :level 0.5) ;; mf sample
+;;   (sampled-cello :note 50 :level 0.8) ;; ff sample
+;;   
 (ns oversampler.cello.inst
   (:require [overtone.live :as o]
             [oversampler.cello.raw :as raw]
             [oversampler.cello.bank :as bank]))
 
-
 ;; Silent buffer used to fill in for any missing notes
 (defonce ^:private silent-buffer (o/buffer 0))
+
+;; ======================================================================
+;; several index buffers to use for grabbing per-note control information
 
 (defn- set-buffer-indices
   [buf offset volume]
@@ -55,6 +67,7 @@
     (set-buffer-lengths buf 256 raw/ff)
     buf))
 
+;; ======================================================================
 ;; the sampled-cello instrument
 (o/definst sampled-cello
   [note 60 level 1 rate 1 loop? 0

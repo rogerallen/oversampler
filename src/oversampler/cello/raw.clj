@@ -1,13 +1,18 @@
+;;
+;; code that describes the mapping of raw sample data for use in making a sound bank
+;;
 (ns oversampler.cello.raw
   (:require [overtone.live :as o]))
 
-;; volume values that the raw values are "close" to and we can normalize to these.  FIXME may need "input" and "output" versions.
+;; volume values that the raw values are "close" to and we can
+;; normalize to these.
+;; FIXME may need "input" and "output" versions?
+;; FIXME should these be in "raw"?  should they be keywords?
 (def ff 0.50)
 (def mf 0.25)
 (def pp 0.15)
 
-;; these are the raw sample paths.
-;; FIXME upload to freesound.
+;; these are the raw sample paths for when data is local & not from the freesound cache.
 ;;
 ;; download http://theremin.music.uiowa.edu/MIScello2012.html Cello.arco.mono.1644.1.zip
 ;;    and unzip into samples subdirectory
@@ -16,13 +21,17 @@
 ;;
 ;; 2222222 3333333 4444444 5555555
 ;; cdefgab cdefgab cdefgab cdefgab
-;;              aa aaaaaaa aaaaaa
-;;          dddddd ddddddd dd
-;;     ggg ggggggg ggggg
-;; ccccccc ccccccc c
+;;              AA AAAAAAA AAAAAA
+;;          DDDDdd ddddddd dd
+;;     GGG Ggggggg ggggg
+;; CCCcccc ccccccc c
+;;
+;; capital letters show which samples are actually used.
+;; FIXME -- review this usage.  It may be possible to avoid downloading
+;;          the 2nd half of all sulC, sulG, sulD data.
 ;;
 (def sample-paths
-  ;; tuple of starting-index, volume(ish), and path(FIXME freesound id)
+  ;; tuple of starting-index, volume(ish), and path
   [
    [ (o/note :a3) ff "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"]
    [ (o/note :a4) ff "./src/oversampler/samples/Cello.arco.ff.sulA.A4A5.mono.aif"]
@@ -52,7 +61,8 @@
    [ (o/note :c3) pp "./src/oversampler/samples/Cello.arco.pp.sulC.C3C4.mono.aif"]
    ])
 
-
+;; these are the raw sample paths for when data is from the freesound cache.
+;;
 ;;(freesound-searchm [:id] "Cello" :f "pack:MIS.Cello2012.Arco.Mono")
 ;;(freesound-info 164125)
 (def freesound-ids

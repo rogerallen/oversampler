@@ -4,6 +4,9 @@
         oversampler.cello.bank
         overtone.live))
 
+(println "initializing cello")
+(time (sampled-cello-init))
+
 (import 'javax.swing.JOptionPane)
 
 (defn ask-user-tf

@@ -31,6 +31,7 @@ Code is under development.  Use at your own risk.
 Cello is "beta" at this point.  Use via:
 
     (use 'oversampler.cello.inst)
+    (sampled-cello-init)
     (sampled-cello :note 50 :level 0.5)
 
 See core.clj comments for other things you can do with the code.

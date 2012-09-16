@@ -18,7 +18,6 @@
 
 ;; ======================================================================
 ;; several index buffers to use for grabbing per-note control information
-
 (defn- fill-buffer-sample-ids
   "fill 128 sample-ids in buf starting at offset for a particular volume (pp, mf, ff)"
   [buf offset volume]
@@ -30,9 +29,9 @@
 (defonce ^:private note-to-sample-id-buffer
   (let [buf (o/buffer (* 3 128))]
     (o/buffer-fill! buf (:id silent-buffer))
-    (fill-buffer-sample-ids buf 0 raw/pp)
-    (fill-buffer-sample-ids buf 128 raw/mf)
-    (fill-buffer-sample-ids buf 256 raw/ff)
+    ;;(fill-buffer-sample-ids buf 0 raw/pp)
+    ;;(fill-buffer-sample-ids buf 128 raw/mf)
+    ;;(fill-buffer-sample-ids buf 256 raw/ff)
     buf))
 
 (defn- fill-buffer-scaling-factors
@@ -46,9 +45,9 @@
 (defonce ^:private note-to-level-scale-buffer
   (let [buf (o/buffer (* 3 128))]
     (o/buffer-fill! buf 1.0)
-    (fill-buffer-scaling-factors buf 0 raw/pp)
-    (fill-buffer-scaling-factors buf 128 raw/mf)
-    (fill-buffer-scaling-factors buf 256 raw/ff)
+    ;;(fill-buffer-scaling-factors buf 0 raw/pp)
+    ;;(fill-buffer-scaling-factors buf 128 raw/mf)
+    ;;(fill-buffer-scaling-factors buf 256 raw/ff)
     buf))
 
 (defn- fill-buffer-lengths
@@ -66,37 +65,81 @@
 (defonce ^:private note-to-length-buffer
   (let [buf (o/buffer (* 3 128))]
     (o/buffer-fill! buf 0.0)
-    (fill-buffer-lengths buf 0 raw/pp)
-    (fill-buffer-lengths buf 128 raw/mf)
-    (fill-buffer-lengths buf 256 raw/ff)
+    ;;(fill-buffer-lengths buf 0 raw/pp)
+    ;;(fill-buffer-lengths buf 128 raw/mf)
+    ;;(fill-buffer-lengths buf 256 raw/ff)
     buf))
 
 ;; buffer of buffer-offsets for level to index through.
 ;; 0 = pp, 128 = mf, 256 = ff
 (defonce ^:private level-to-offset-buffer
   (let [buf (o/buffer 21)]
-    (o/buffer-set! buf  0 0) ;; 0.00
-    (o/buffer-set! buf  1 0) ;; 0.05
-    (o/buffer-set! buf  2 0) ;; 0.10
-    (o/buffer-set! buf  3 0)
-    (o/buffer-set! buf  4 0)
-    (o/buffer-set! buf  5 0)
-    (o/buffer-set! buf  6 128) ;; 0.30
-    (o/buffer-set! buf  7 128)
-    (o/buffer-set! buf  8 128) ;; 0.40
-    (o/buffer-set! buf  9 128)
-    (o/buffer-set! buf 10 128) ;; 0.50
-    (o/buffer-set! buf 11 128)
-    (o/buffer-set! buf 12 128) ;; 0.60
-    (o/buffer-set! buf 13 128)
-    (o/buffer-set! buf 14 128) ;; 0.70
-    (o/buffer-set! buf 15 128)
-    (o/buffer-set! buf 16 128) ;; 0.80
-    (o/buffer-set! buf 17 256) ;; 0.85
-    (o/buffer-set! buf 18 256) ;; 0.90
-    (o/buffer-set! buf 19 256) ;; 0.95
-    (o/buffer-set! buf 20 256)
+    (o/buffer-fill! buf 0)
+    ;; (o/buffer-set! buf  0 0) ;; 0.00
+    ;; (o/buffer-set! buf  1 0) ;; 0.05
+    ;; (o/buffer-set! buf  2 0) ;; 0.10
+    ;; (o/buffer-set! buf  3 0)
+    ;; (o/buffer-set! buf  4 0)
+    ;; (o/buffer-set! buf  5 0)
+    ;; (o/buffer-set! buf  6 128) ;; 0.30
+    ;; (o/buffer-set! buf  7 128)
+    ;; (o/buffer-set! buf  8 128) ;; 0.40
+    ;; (o/buffer-set! buf  9 128)
+    ;; (o/buffer-set! buf 10 128) ;; 0.50
+    ;; (o/buffer-set! buf 11 128)
+    ;; (o/buffer-set! buf 12 128) ;; 0.60
+    ;; (o/buffer-set! buf 13 128)
+    ;; (o/buffer-set! buf 14 128) ;; 0.70
+    ;; (o/buffer-set! buf 15 128)
+    ;; (o/buffer-set! buf 16 128) ;; 0.80
+    ;; (o/buffer-set! buf 17 256) ;; 0.85
+    ;; (o/buffer-set! buf 18 256) ;; 0.90
+    ;; (o/buffer-set! buf 19 256) ;; 0.95
+    ;; (o/buffer-set! buf 20 256)
     buf)) ;; 1.00
+
+;; ======================================================================
+;; initialize the cello instrument buffers
+;;
+;; FIXME -- what happens if this is called twice?
+;; FIXME -- what happens if this is not called before sampled-cello?
+;; FIXME -- only load the range of cello notes we'll actually use
+;; FIXME -- only load the volume of cello notes we'll actually use
+(defn sampled-cello-init
+  "initialize all things for the cello"
+  []
+  (fill-buffer-sample-ids note-to-sample-id-buffer 0 raw/pp)
+  (fill-buffer-sample-ids note-to-sample-id-buffer 128 raw/mf)
+  (fill-buffer-sample-ids note-to-sample-id-buffer 256 raw/ff)
+  (fill-buffer-scaling-factors note-to-level-scale-buffer 0 raw/pp)
+  (fill-buffer-scaling-factors note-to-level-scale-buffer 128 raw/mf)
+  (fill-buffer-scaling-factors note-to-level-scale-buffer 256 raw/ff)
+  (fill-buffer-lengths note-to-length-buffer 0 raw/pp)
+  (fill-buffer-lengths note-to-length-buffer 128 raw/mf)
+  (fill-buffer-lengths note-to-length-buffer 256 raw/ff)
+  (o/buffer-set! level-to-offset-buffer  0 0) ;; 0.00
+  (o/buffer-set! level-to-offset-buffer  1 0) ;; 0.05
+  (o/buffer-set! level-to-offset-buffer  2 0) ;; 0.10
+  (o/buffer-set! level-to-offset-buffer  3 0)
+  (o/buffer-set! level-to-offset-buffer  4 0)
+  (o/buffer-set! level-to-offset-buffer  5 0)
+  (o/buffer-set! level-to-offset-buffer  6 128) ;; 0.30
+  (o/buffer-set! level-to-offset-buffer  7 128)
+  (o/buffer-set! level-to-offset-buffer  8 128) ;; 0.40
+  (o/buffer-set! level-to-offset-buffer  9 128)
+  (o/buffer-set! level-to-offset-buffer 10 128) ;; 0.50
+  (o/buffer-set! level-to-offset-buffer 11 128)
+  (o/buffer-set! level-to-offset-buffer 12 128) ;; 0.60
+  (o/buffer-set! level-to-offset-buffer 13 128)
+  (o/buffer-set! level-to-offset-buffer 14 128) ;; 0.70
+  (o/buffer-set! level-to-offset-buffer 15 128)
+  (o/buffer-set! level-to-offset-buffer 16 128) ;; 0.80
+  (o/buffer-set! level-to-offset-buffer 17 256) ;; 0.85
+  (o/buffer-set! level-to-offset-buffer 18 256) ;; 0.90
+  (o/buffer-set! level-to-offset-buffer 19 256) ;; 0.95
+  (o/buffer-set! level-to-offset-buffer 20 256)
+  nil
+  )
 
 ;; ======================================================================
 ;; the sampled-cello instrument

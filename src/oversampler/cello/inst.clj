@@ -21,29 +21,15 @@
 ;; several index buffers to use for grabbing per-note control information
 ;;
 ;; buffer of buffer ids for instrument note ctl to index through
-(defonce ^:private note-to-sample-id-buffer
-  (let [buf (o/buffer (* 3 128))]
-    (o/buffer-fill! buf (:id silent-buffer))
-    buf))
-
+;; 3 buffers (pp,mf,ff) x 128 midi note values
+(defonce ^:private note-to-sample-id-buffer (o/buffer (* 3 128)))
 ;; buffer of scaling values for note ctl to index through
-(defonce ^:private note-to-level-scale-buffer
-  (let [buf (o/buffer (* 3 128))]
-    (o/buffer-fill! buf 1.0)
-    buf))
-
+(defonce ^:private note-to-level-scale-buffer (o/buffer (* 3 128)))
 ;; buffer of sample-lengths for note ctl to index through
-(defonce ^:private note-to-length-buffer
-  (let [buf (o/buffer (* 3 128))]
-    (o/buffer-fill! buf 0.0)
-    buf))
-
+(defonce ^:private note-to-length-buffer (o/buffer (* 3 128)))
 ;; buffer of buffer-offsets for level to index through.
 ;; 0 = pp, 128 = mf, 256 = ff
-(defonce ^:private level-to-offset-buffer
-  (let [buf (o/buffer 21)]
-    (o/buffer-fill! buf 0)
-    buf))
+(defonce ^:private level-to-offset-buffer (o/buffer 21))
 
 ;; ======================================================================
 ;; buffer filling routines
@@ -72,48 +58,55 @@
             length-in-secs (/ the-length the-rate)] 
         (o/buffer-set! buf (+ offset i) length-in-secs)))))
 
-;; ======================================================================
-;; New required call--initialize the cello instrument buffers
-;;
-;; FIXME -- what happens if this is called twice?
-;; FIXME -- what happens if this is not called before sampled-cello?
-;; FIXME -- only load the range of cello notes we'll actually use
-;; FIXME -- only load the volume of cello notes we'll actually use
-(defn sampled-cello-init
-  "initialize all things for the cello"
+(defn- reset-buffers
+  "reset the buffers when we call init.  allows us to call sampled-cello-init multiple times"
   []
-  (fill-buffer-sample-ids note-to-sample-id-buffer 0 raw/pp)
-  (fill-buffer-sample-ids note-to-sample-id-buffer 128 raw/mf)
-  (fill-buffer-sample-ids note-to-sample-id-buffer 256 raw/ff)
-  (fill-buffer-scaling-factors note-to-level-scale-buffer 0 raw/pp)
-  (fill-buffer-scaling-factors note-to-level-scale-buffer 128 raw/mf)
-  (fill-buffer-scaling-factors note-to-level-scale-buffer 256 raw/ff)
-  (fill-buffer-lengths note-to-length-buffer 0 raw/pp)
-  (fill-buffer-lengths note-to-length-buffer 128 raw/mf)
-  (fill-buffer-lengths note-to-length-buffer 256 raw/ff)
-  (o/buffer-set! level-to-offset-buffer  0 0) ;; 0.00
-  (o/buffer-set! level-to-offset-buffer  1 0) ;; 0.05
-  (o/buffer-set! level-to-offset-buffer  2 0) ;; 0.10
-  (o/buffer-set! level-to-offset-buffer  3 0)
-  (o/buffer-set! level-to-offset-buffer  4 0)
-  (o/buffer-set! level-to-offset-buffer  5 0)
-  (o/buffer-set! level-to-offset-buffer  6 128) ;; 0.30
-  (o/buffer-set! level-to-offset-buffer  7 128)
-  (o/buffer-set! level-to-offset-buffer  8 128) ;; 0.40
-  (o/buffer-set! level-to-offset-buffer  9 128)
-  (o/buffer-set! level-to-offset-buffer 10 128) ;; 0.50
-  (o/buffer-set! level-to-offset-buffer 11 128)
-  (o/buffer-set! level-to-offset-buffer 12 128) ;; 0.60
-  (o/buffer-set! level-to-offset-buffer 13 128)
-  (o/buffer-set! level-to-offset-buffer 14 128) ;; 0.70
-  (o/buffer-set! level-to-offset-buffer 15 128)
-  (o/buffer-set! level-to-offset-buffer 16 128) ;; 0.80
-  (o/buffer-set! level-to-offset-buffer 17 256) ;; 0.85
-  (o/buffer-set! level-to-offset-buffer 18 256) ;; 0.90
-  (o/buffer-set! level-to-offset-buffer 19 256) ;; 0.95
-  (o/buffer-set! level-to-offset-buffer 20 256)
-  nil
-  )
+  (o/buffer-fill! note-to-sample-id-buffer   (:id silent-buffer))
+  (o/buffer-fill! note-to-level-scale-buffer 1.0)
+  (o/buffer-fill! note-to-length-buffer      0.0)
+  (o/buffer-fill! level-to-offset-buffer     0)
+  nil)
+
+;; ======================================================================
+;; initialize the cello instrument buffers
+(defn sampled-cello-init
+  "initialize all things for the cello.  by default, only mf samples will be used."
+  [& {:keys [min-note-index max-note-index pp-volume-cutoff mf-volume-cutoff]
+      :or {min-note-index bank/min-index
+           max-note-index bank/max-index
+           pp-volume-cutoff 0.0
+           mf-volume-cutoff 1.0}}]
+  (let [load-pp-samples (> pp-volume-cutoff 0.0)
+        load-mf-samples (> mf-volume-cutoff 0.0)
+        load-ff-samples (< mf-volume-cutoff 1.0)]
+    (reset-buffers)
+    (when load-pp-samples
+      (fill-buffer-sample-ids note-to-sample-id-buffer 0 raw/pp)
+      (fill-buffer-scaling-factors note-to-level-scale-buffer 0 raw/pp)
+      (fill-buffer-lengths note-to-length-buffer 0 raw/pp))
+    (when load-mf-samples
+      (fill-buffer-sample-ids note-to-sample-id-buffer 128 raw/mf)
+      (fill-buffer-scaling-factors note-to-level-scale-buffer 128 raw/mf)
+      (fill-buffer-lengths note-to-length-buffer 128 raw/mf))
+    (when load-ff-samples
+      (fill-buffer-sample-ids note-to-sample-id-buffer 256 raw/ff)
+      (fill-buffer-scaling-factors note-to-level-scale-buffer 256 raw/ff)
+      (fill-buffer-lengths note-to-length-buffer 256 raw/ff))
+    (dotimes [i 21]
+      (let [cur-volume (/ i 20.0)
+            cur-offset (cond
+                        (< cur-volume pp-volume-cutoff) 0
+                        (<= cur-volume mf-volume-cutoff) 128
+                        :else 256)]
+        (o/buffer-set! level-to-offset-buffer i cur-offset)))
+    nil))
+
+;; ======================================================================
+;; This initializes the cello banks with the default settings
+(println "Initializing default cello samples...")
+;; (time (sampled-cello-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85))
+(time (sampled-cello-init))
+(println "done.")
 
 ;; ======================================================================
 ;; the sampled-cello instrument

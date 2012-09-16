@@ -4,8 +4,9 @@
         oversampler.cello.bank
         overtone.live))
 
-(println "initializing cello")
-(time (sampled-cello-init))
+(println "Setup test cello samples...")
+(time (sampled-cello-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85))
+(println "done.")
 
 (import 'javax.swing.JOptionPane)
 
@@ -23,7 +24,7 @@
               cur-pitch-idx (+ min-index i)
               _ (demo 4 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
               _ (sampled-cello :note cur-pitch-idx :level cur-level)
-              good (ask-user-tf (format "Playing pitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
+              good (ask-user-tf (format "Playing sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
           (println cur-pitch-idx cur-level good)
           (is good))))))
 
@@ -34,9 +35,9 @@
       (dotimes [l 5]
         (let [cur-level (nth [0.2 0.4 0.6 0.8 1.0] l)
               cur-pitch-idx (nth [40 50 60] i)
-              _ (demo 4 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
+              _ (demo 0.5 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
               _ (sampled-cello :note cur-pitch-idx :level cur-level)
-              good (ask-user-tf (format "Playing pitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
+              good (ask-user-tf (format "Playing sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
           (println cur-pitch-idx cur-level good)
           (is good))))))
 

@@ -24,8 +24,7 @@
           (println cur-pitch-idx cur-level good)
           (is good))))))
 
-
-(deftest cello-test-2
+(deftest ^:quick cello-test-2
   (testing "test the cello"
     (println "testing 5 volumes across a few notes")
     (dotimes [i 3]

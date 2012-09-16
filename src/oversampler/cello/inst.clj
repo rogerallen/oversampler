@@ -67,12 +67,39 @@
     (set-buffer-lengths buf 256 raw/ff)
     buf))
 
+;; buffer of buffer-offsets for level to index through.
+;; 0 = pp, 128 = mf, 256 = ff
+(defonce ^:private level-to-offset-buffer
+  (let [buf (o/buffer 21)]
+    (o/buffer-set! buf  0 0) ;; 0.00
+    (o/buffer-set! buf  1 0) ;; 0.05
+    (o/buffer-set! buf  2 0) ;; 0.10
+    (o/buffer-set! buf  3 0)
+    (o/buffer-set! buf  4 0)
+    (o/buffer-set! buf  5 0)
+    (o/buffer-set! buf  6 128) ;; 0.30
+    (o/buffer-set! buf  7 128)
+    (o/buffer-set! buf  8 128) ;; 0.40
+    (o/buffer-set! buf  9 128)
+    (o/buffer-set! buf 10 128) ;; 0.50
+    (o/buffer-set! buf 11 128)
+    (o/buffer-set! buf 12 128) ;; 0.60
+    (o/buffer-set! buf 13 128)
+    (o/buffer-set! buf 14 128) ;; 0.70
+    (o/buffer-set! buf 15 128)
+    (o/buffer-set! buf 16 128) ;; 0.80
+    (o/buffer-set! buf 17 256) ;; 0.85
+    (o/buffer-set! buf 18 256) ;; 0.90
+    (o/buffer-set! buf 19 256) ;; 0.95
+    (o/buffer-set! buf 20 256)
+    buf)) ;; 1.00
+
 ;; ======================================================================
 ;; the sampled-cello instrument
 (o/definst sampled-cello
   [note 60 level 1 rate 1 loop? 0
    attack 0 decay 1 sustain 1 release 0.2 curve -4 gate 1]
-  (let [ofst (* 128 (o/floor (* 3 (o/frac level)))) ;; select pp/mf/ff samples FIXME 1.0
+  (let [ofst (o/index:kr (:id level-to-offset-buffer) (o/floor (* 20 level))) ;; FIXME -- (o/max 0.0 (o/min 1.0 level)))))
         buf (o/index:kr (:id index-buffer) (+ ofst note))
         the-sample-scale (o/index:kr (:id sample-scale-buffer) (+ ofst note))
         the-sample-length (o/index:kr (:id sample-length-buffer) (+ ofst note))
@@ -83,4 +110,4 @@
         ;; regular adsr envelope
         env (o/env-gen (o/adsr attack decay sustain release level curve)
                        :gate gate :action o/FREE)]
-    (* env2 env (o/scaled-play-buf 1 buf :level 1.0 :loop loop? :action o/FREE))))
+    (* level env2 env (o/scaled-play-buf 1 buf :level 1.0 :loop loop? :action o/FREE))))

@@ -66,30 +66,30 @@
 ;;(freesound-searchm [:id] "Cello" :f "pack:MIS.Cello2012.Arco.Mono")
 ;;(freesound-info 164125)
 (def freesound-ids
-  {"Cello.arco.ff.sulA.A3Ab4.mono.aif" 164125
+  {"Cello.arco.ff.sulA.A3Ab4.mono.aif" 164125 ; used by default
    "Cello.arco.ff.sulA.A4A5.mono.aif"  164124
-   "Cello.arco.ff.sulD.D3Db4.mono.aif" 164129
+   "Cello.arco.ff.sulD.D3Db4.mono.aif" 164129 ; used
    "Cello.arco.ff.sulD.D4D5.mono.aif"  164128
-   "Cello.arco.ff.sulG.G2Gb3.mono.aif" 164127
+   "Cello.arco.ff.sulG.G2Gb3.mono.aif" 164127 ; used
    "Cello.arco.ff.sulG.G3D4.mono.aif"  164126
-   "Cello.arco.ff.sulC.C2B2.mono.aif"  164123
+   "Cello.arco.ff.sulC.C2B2.mono.aif"  164123 ; used
    "Cello.arco.ff.sulC.C2D3.mono.aif"  164122
    
-   "Cello.arco.mf.sulA.A3Ab4.mono.aif" 164131
+   "Cello.arco.mf.sulA.A3Ab4.mono.aif" 164131 ; used
    "Cello.arco.mf.sulA.A4A5.mono.aif"  164130
-   "Cello.arco.mf.sulD.D3Db4.mono.aif" 164137
+   "Cello.arco.mf.sulD.D3Db4.mono.aif" 164137 ; used
    "Cello.arco.mf.sulD.D4D5.mono.aif"  164136
-   "Cello.arco.mf.sulG.G2Gb3.mono.aif" 164144
+   "Cello.arco.mf.sulG.G2Gb3.mono.aif" 164144 ; used
    "Cello.arco.mf.sulG.G3G4.mono.aif"  164143
-   "Cello.arco.mf.sulC.C2B2.mono.aif"  164140
+   "Cello.arco.mf.sulC.C2B2.mono.aif"  164140 ; used
    "Cello.arco.mf.sulC.C3C4.mono.aif"  164139
    
-   "Cello.arco.pp.sulA.A3Ab4.mono.aif" 164142
+   "Cello.arco.pp.sulA.A3Ab4.mono.aif" 164142 ; used
    "Cello.arco.pp.sulA.A4A5.mono.aif"  164141
-   "Cello.arco.pp.sulD.D3Db4.mono.aif" 164134
+   "Cello.arco.pp.sulD.D3Db4.mono.aif" 164134 ; used
    "Cello.arco.pp.sulD.D4D5.mono.aif"  164135
-   "Cello.arco.pp.sulG.G2Gb3.mono.aif" 164132
+   "Cello.arco.pp.sulG.G2Gb3.mono.aif" 164132 ; used
    "Cello.arco.pp.sulG.G3G4.mono.aif"  164133
-   "Cello.arco.pp.sulC.C2B2.mono.aif"  164146
+   "Cello.arco.pp.sulC.C2B2.mono.aif"  164146 ; used
    "Cello.arco.pp.sulC.C3C4.mono.aif"  164145
    })

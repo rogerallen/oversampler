@@ -17,9 +17,11 @@ A Clojure library for adjusting & playing music samples in the Overtone project.
       ? make each same length?    
     X code is too "cello" centric.
     X upload cello sounds to freesound & adjust interface
-    O fix so volume is not discreet in 3 steps
-    O fix list of samples to only download files that are actually used.
+    X fix so volume is not discreet in 3 steps
+    X fix list of samples to only download files that are actually used.
+    X removed some upper cello notes that sounded thin.
     O cello sounds need a good ear to listen/critique/adjust
+      O some are out of tune.
     O needs better docs
 
 ## Usage

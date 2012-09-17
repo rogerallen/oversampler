@@ -1,10 +1,30 @@
 # oversampler
 
-A Clojure library for adjusting & playing music samples in the Overtone project.
+A Clojure library for analyzing, adjusting & playing music samples in
+the [Overtone](http://github.com/overtone/overtone) project.
 
 ## Usage
 
-### Cello Instrument
+### Piano
+
+Uses the same samples that the overtone.inst.sampled-piano uses, but
+allows you to have both loud & medium versions available for a bit
+more flexibility.  By default, oversampler uses the medium (mf)
+samples & overtone's uses just the loud (ff) ones.
+
+Basic use via:
+
+    (use 'oversampler.piano.inst)
+    (sampled-piano :note 50 :level 0.5)
+    
+To get access to 2 sets of samples medium (mf) and loud (ff) you need
+to init to have a cutoff point like:
+
+    (sampled-piano-init :mf-volume-cutoff 0.85)
+    (sampled-piano :note 50 :level 0.5) ;; mf sample
+    (sampled-piano :note 50 :level 0.9) ;; ff sample
+
+### Cello
 
 The sampled-cello is usable at this point, but could use review from others for tuning and guidance on the best way to map the samples to volumes.  
 

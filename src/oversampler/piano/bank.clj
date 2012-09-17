@@ -179,10 +179,20 @@
    {:index 108 :volume raw/mf :path (o/freesound-path 148607)}
    ])
 
+(defn- load-sample-into-info
+  "given an info map of the sample, load & add the sample"
+  [x]
+  (assoc x :sample (o/load-sample (:path x))))
+
 (defn- load-samples-into-infos
   "given a key value tuple where the value is an array of sample-info, load samples"
   [xs]
   (map load-sample-into-info xs))
+
+(defn- get-sample-info-map
+  "return map of sample-info. map key is :index"
+  []
+  (group-by :index sample-info-list))
 
 ;; the main map of cello samples. map key is midi-index
 (defonce sample-info-map

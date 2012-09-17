@@ -1,4 +1,4 @@
-(defproject oversampler "0.1.0-SNAPSHOT"
+(defproject oversampler "0.1.0"
   :description "overtone sampler library"
   :url "https://github.com/rogerallen/oversampler"
   :license {:name "Eclipse Public License"

@@ -128,5 +128,14 @@
     (recording-stop)
     )
 
-    (record-testing)
+  (record-testing)
+
+  ;; ======================================================================
+  ;; getting things in tune
+
+  (Math/pow 2 (/ 2 12)) ; 1.122462048309373
+  ;; these are consonant
+  (sampled-cello :note (note :c3) :level 0.5 :rate 1.1225)
+  (sampled-cello :note (note :d3) :level 0.5)
+  
   )

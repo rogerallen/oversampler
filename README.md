@@ -2,39 +2,35 @@
 
 A Clojure library for adjusting & playing music samples in the Overtone project.
 
-## TODO List
-
-    X get basic division of code
-      X analysis of samples, view samples
-      X bank - to load samples for future use
-      X inst - the instrument of course
-    X cello notes need some processing
-      X alignment
-        - C2 shows noise before initial attack, delaying start.  
-          found start point via midpoint of 90th percentile volume
-      X add fade-in/out from/to 0
-      X find normalized volume
-      ? make each same length?    
-    X code is too "cello" centric.
-    X upload cello sounds to freesound & adjust interface
-    X fix so volume is not discreet in 3 steps
-    X fix list of samples to only download files that are actually used.
-    X removed some upper cello notes that sounded thin.
-    X Fixed the most out of tune notes.
-    O cello sounds need review by others for loudness & tuning, etc.
-    O needs better docs
-
 ## Usage
 
-Code is under development.  Use at your own risk.
+### Cello Instrument
 
-Cello is "beta" at this point.  Use via:
+The sampled-cello is usable at this point, but could use review from others for tuning and guidance on the best way to map the samples to volumes.  
+
+Basic use via:
 
     (use 'oversampler.cello.inst)
-    (sampled-cello-init)
     (sampled-cello :note 50 :level 0.5)
+    
+There are 3 sets of samples soft (pp), medium (mf) and loud (ff).  By default only the mf samples are used.  If you want all 3 sets of samples, try something like:
 
-See core.clj comments for other things you can do with the code.
+    (sampled-cello-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85)
+    (sampled-cello :note 50 :level 0.2) ;; pp sample
+    (sampled-cello :note 50 :level 0.5) ;; mf sample
+    (sampled-cello :note 50 :level 0.9) ;; ff sample
+
+### Analysis
+
+Analysis code is under development & doesn't have any docs.  See
+core.clj comments for other things you can do with the code.  It is
+also commented out for normal distribution, since it uses Incanter and
+that's not something normal sample players should need.
+
+## TODO List
+
+    o cello sounds need review by others for loudness, tuning, etc.
+    o needs better docs
 
 ## License
 

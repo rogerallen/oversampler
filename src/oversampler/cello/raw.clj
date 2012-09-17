@@ -6,7 +6,6 @@
 
 ;; volume values that the raw values are "close" to and we can
 ;; normalize to these.
-;; FIXME may need "input" and "output" versions?
 ;; FIXME should these be in "raw"?  should they be keywords?
 (def ff 0.50)
 (def mf 0.25)

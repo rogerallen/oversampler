@@ -20,8 +20,8 @@ A Clojure library for adjusting & playing music samples in the Overtone project.
     X fix so volume is not discreet in 3 steps
     X fix list of samples to only download files that are actually used.
     X removed some upper cello notes that sounded thin.
-    O cello sounds need a good ear to listen/critique/adjust
-      O some are out of tune.
+    X Fixed the most out of tune notes.
+    O cello sounds need review by others for loudness & tuning, etc.
     O needs better docs
 
 ## Usage

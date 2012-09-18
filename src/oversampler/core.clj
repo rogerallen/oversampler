@@ -137,5 +137,9 @@
   ;; these are consonant
   (sampled-cello :note (note :c3) :level 0.5 :rate 1.1225)
   (sampled-cello :note (note :d3) :level 0.5)
+
+  (defn check-note [n l r]
+    (sampled-cello :note n :level l :rate r)
+    (demo 4 (pan2 (sin-osc (midicps n)))))
   
   )

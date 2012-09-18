@@ -12,8 +12,8 @@
 ;; Silent buffer used to fill in for any missing notes
 (defonce ^:private silent-buffer (o/buffer 0))
 ;; buffer of buffer ids for instrument note ctl to index through
-;; 3 buffers (pp,mf,ff) x 128 midi note values
-(defonce ^:private note-to-sample-id-buffer (o/buffer (* 3 128)))
+;; 2 buffers (mf,ff) x 128 midi note values
+(defonce ^:private note-to-sample-id-buffer (o/buffer (* 2 128)))
 ;; buffer of buffer-offsets for level to index through.
 ;; 0 = mf, 128 = ff
 (defonce ^:private level-to-offset-buffer (o/buffer 21))
@@ -42,7 +42,7 @@
       :or {min-note-index bank/min-index
            max-note-index bank/max-index
            pp-volume-cutoff 0.0
-           mf-volume-cutoff 0.0}}]
+           mf-volume-cutoff 1.0}}]
   (let [load-mf-samples (> mf-volume-cutoff 0.0)
         load-ff-samples (< mf-volume-cutoff 1.0)]
     (reset-buffers)

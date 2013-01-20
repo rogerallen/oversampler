@@ -142,4 +142,14 @@
     (sampled-cello :note n :level l :rate r)
     (demo 4 (pan2 (sin-osc (midicps n)))))
   
+  ;; ======================================================================
+  ;; notes on looping
+  ;; ff.C2 file
+  ;; find spot near 3.5s (154,317) & 4.0s (176,500) to loop
+  ;; [154393, 176349]
+  ;; no good just picking arbitrary points like that.  need to find
+  ;; areas that sound right.
+  ;; try near 169845 and 189737 Z [169924 189704]
+  ;;
+
   )

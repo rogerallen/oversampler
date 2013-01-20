@@ -69,9 +69,11 @@
 ;; the sampled-piano instrument
 (o/definst sampled-piano
   [note 60 level 1 rate 1
-   attack 0 decay 1 sustain 1 release 0.2 curve -4 gate 1]
+   attack 0 decay 1 sustain 1 release 0.2 curve -4 gate 1
+   play-buf-action o/FREE]
   (let [ofst (o/index:kr (:id level-to-offset-buffer) (o/floor (* 20 level)))
         the-sample-id (o/index:kr (:id note-to-sample-id-buffer) (+ ofst note))
         env (o/env-gen (o/adsr attack decay sustain release level curve)
                        :gate gate :action o/FREE)]
-    (* env (o/scaled-play-buf 2 the-sample-id :rate rate :level level :action o/FREE))))
+    (* env (o/scaled-play-buf 2 the-sample-id :rate rate :level level
+                              :action play-buf-action))))

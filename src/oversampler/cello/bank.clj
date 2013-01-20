@@ -370,25 +370,6 @@
         scaled-value (* smooth-value (/ buffer-volume buffer-ppeak))]
     scaled-value))
 
-;; must only be in later versions.  HACK! FIXME!
-(def MAX-OSC-SAMPLES
-  "Max number of samples supported in a UDP OSC message"
-  4096)
-(defn buffer-write-relay!
-  "Similar to buffer-write! except it is capable of handling very large
-  buffers by slicing them up and writing each slice separately. Can be
-  very slow."
-  ([buf data] (buffer-write-relay! buf 0 data))
-  ([buf start-idx data]
-     (assert (o/buffer? buf))
-     (loop [data-left data
-            idx       0]
-       (let [to-write  (take MAX-OSC-SAMPLES data-left)
-             data-left (drop MAX-OSC-SAMPLES data-left)]
-         (when-not (empty? to-write)
-           (o/buffer-write! buf idx to-write)
-           (recur data-left (+ idx (count to-write))))))))
-
 (defn- load-sample-into-info
   "given an info map of the sample, load & add the sample"
   [x]

@@ -126,7 +126,8 @@
 ;; the sampled-cello instrument
 (o/definst sampled-cello
   [note 60 level 1 rate 1 
-   attack 0 decay 1 sustain 1 release 0.2 curve -4 gate 1]
+   attack 0 decay 1 sustain 1 release 0.2 curve -4 gate 1
+   play-buf-action o/FREE]
   (let [ofst (o/index:kr (:id level-to-offset-buffer) (o/floor (* 20 level)))
         the-sample-id (o/index:kr (:id note-to-sample-id-buffer) (+ ofst note))
         the-sample-scale (o/index:kr (:id note-to-level-scale-buffer) (+ ofst note))
@@ -141,4 +142,5 @@
         env (o/env-gen (o/adsr attack decay sustain release level curve)
                        :gate gate :action o/FREE)
         the-rate (* rate (o/index:kr (:id note-to-rate-buffer) (+ ofst note)))]
-    (* level env2 env (o/scaled-play-buf 1 the-sample-id :rate the-rate :level 1.0 :action o/FREE))))
+    (* level env2 env (o/scaled-play-buf 1 the-sample-id :rate the-rate :level 1.0
+                                         :action play-buf-action))))

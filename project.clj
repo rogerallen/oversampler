@@ -14,6 +14,7 @@
    ;;[incanter "1.2.3-SNAPSHOT"]
    ]
   :plugins [ [lein-swank "1.4.4"] ]
-  :main ^{:skip-aot true} oversampler.core
+  ;; had to comment this out before "lein install" would work
+  ;;:main ^{:skip-aot true} oversampler.core
   :test-selectors {:quick :quick}
   )

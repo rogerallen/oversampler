@@ -1,11 +1,4 @@
-(ns oversampler.core
-  (:use
-   ;; When doing analysis, uncomment the Incanter library in project.clj and the analysis use line below.
-   ;; When deploying, comment this out.  See project.clj for more info.
-   ;;[oversampler analysis]
-   [oversampler.cello.inst])
-  (:require [oversampler.cello.raw :as cello.raw]
-            [oversampler.cello.bank :as cello.bank]))
+(ns oversampler.core)
 
 (defn -main
   "Not sure what to do about this..."
@@ -15,7 +8,15 @@
 ;; ======================================================================
 (comment
 
-  (use 'overtone.live)
+  (:use
+   ;; When doing analysis, uncomment the Incanter library in project.clj and the analysis use line below.
+   ;; When deploying, comment this out.  See project.clj for more info.
+   ;;[oversampler analysis]
+   [oversampler.cello.inst])
+  (:require [oversampler.cello.raw :as cello.raw]
+            [oversampler.cello.bank :as cello.bank]))
+
+(use 'overtone.live)
   (use 'oversampler analysis) ;; !!! see above !!!
   (use 'oversampler.cello.inst)
 

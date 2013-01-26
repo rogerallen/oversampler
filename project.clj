@@ -1,11 +1,11 @@
-(defproject oversampler "0.3.0-SNAPSHOT"
+(defproject oversampler "0.3.0"
   :description "overtone sampler library"
   :url "https://github.com/rogerallen/oversampler"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies
   [[org.clojure/clojure "1.4.0"]
-   [overtone "0.8.0-RC19"]
+   [overtone "0.8.0"]
    ;; When doing analysis, uncomment the Incanter library and the analysis use line in core.clj
    ;; When deploying, comment it out.
    ;; The reason is that Incanter is not necessary for playing samples and can sometimes

@@ -1,4 +1,8 @@
-(ns oversampler.core)
+(ns oversampler.core
+  ;; comment on deploy
+  (:use [oversampler.analysis]
+        [criterium.core])
+  )
 
 (defn -main
   "Not sure what to do about this..."
@@ -22,7 +26,12 @@
 
   (require '[oversampler.cello.raw :as cello.raw])
   (require '[oversampler.cello.bank :as cello.bank])
-  
+
+;; get time-body in seconds
+;; (tbs (time-body (Thread/sleep 1000)))
+(defn tbs [[t r]]
+    [(/ t 1e9) r])
+
   ;; ============================================================
   ;; do analysis on the raw sound files
   
@@ -30,7 +39,7 @@
   (print-sample-file-info cello.raw/sample-paths)
 
   ;; use Incanter graphs to look over one of the samples
-  (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
+  (view-sample "./src/oversampler/samples/Guitar.mf.sulE.E2B2.aif")
   (view-sample (nth (nth cello.raw/sample-paths 3) 2))
 
   ;; play a sample from a file

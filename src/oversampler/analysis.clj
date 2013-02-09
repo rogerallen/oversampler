@@ -15,23 +15,27 @@
             [incanter.charts :as ich]
             [oversampler.utils :as osu]))
 
+(def NUM-GRAPH-POINTS 500) ;; to not overload incanter graphs, reduce # samples
+
 (defn rms
   "root mean square of sequence of floats."
   [xs]
   (Math/sqrt (reduce + (map #(* % %) xs))))
 
+;; adding the ^double takes this from 18s -> 4s on one view-sample (W00t!)
+;; continual use seemed to drop this down to < 2s.
+;; tried a custom version to get rid of wrapping map-indexed & got nothing
 (defn abss
-  "root mean square of sequence of floats."
+  "max absolute value of sequence of floats."
   [xs]
-  (reduce max (map #(Math/abs %) xs)))
+  (reduce (fn [^double x ^double y] (max x y))
+          (map (fn [^double x] (Math/abs x)) xs)))
 
 (defn flast
   "like ffirst"
   [xs]
   (nth (last xs) 0))
 
-;; hmm, wonder if Incanter has rms-type algorithms I can use. (didn't find any)
-;; after review.  min/max is better than rms for viewing.
 ;; FIXME -- add version with start/end sample for 'zooming'
 ;; FIXME -- add way to overlay samples?
 (defn view-sample
@@ -39,26 +43,20 @@
   [path]
   (let [the-buffer (o/load-sample path)
         the-samples (o/buffer-data the-buffer)
-        num-parts 500 ; to not overload incanter
-        samples-per-part (int (/ (:n-samples
-                                  (o/buffer-info the-buffer)) num-parts))
-        indexed-abs-per-part (map-indexed vector (map abss (partition samples-per-part the-samples)))
-        ;;indexed-rms-per-part (map-indexed vector (map rms (partition samples-per-part the-samples)))
-        ;;indexed-min-per-part (map-indexed vector
-        ;;                                  (map #(* 10 (apply min %)) (partition samples-per-part the-samples)))
-        ;;indexed-max-per-part (map-indexed vector
-        ;;                                  (map #(* 10 (apply max %)) (partition samples-per-part the-samples)))
-        abs-dataset (ico/dataset ["t" "rms"] indexed-abs-per-part)]
-        ;;rms-dataset (ico/dataset ["t" "rms"] indexed-rms-per-part)
-        ;;min-dataset (ico/dataset ["t" "rms"] indexed-min-per-part)
-        ;;max-dataset (ico/dataset ["t" "rms"] indexed-max-per-part)]
+        num-samples (:n-samples (o/buffer-info the-buffer))
+        samples-per-part (int (/ num-samples NUM-GRAPH-POINTS))
+        _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS "points (" samples-per-part "samples/point)")
+        fn abss ;; rms
+        fn-name "abs" ;; "rms"
+        indexed-fn-per-part (map-indexed vector (map abss (partition samples-per-part the-samples)))
+        fn-dataset (ico/dataset ["t" fn-name] indexed-fn-per-part)]
     (doto (ich/xy-plot
-           ;;(ico/sel rms-dataset :cols 0) (ico/sel rms-dataset :cols 1)
-           (ico/sel abs-dataset :cols 0) (ico/sel abs-dataset :cols 1)
-           :x-label "samples" :y-label "amp")
+           (ico/sel fn-dataset :cols 0)
+           (ico/sel fn-dataset :cols 1)
+           :x-label "reduced samples"
+           :y-label fn-name)
       ;;(ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
-      ico/view)
-    ))
+      ico/view)))
 ;; (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
 
 ;; Grr...out of memory when trying to view the whole thing. Why? 

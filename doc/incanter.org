@@ -1,0 +1,190 @@
+* Setup
+* Datasets
+** Creating Datasets
+(use 'incanter.core)
+(dataset ["x1" "x2" "x3"] 
+         [[1 2 3] 
+          [4 5 6] 
+          [7 8 9]])
+(to-dataset [{"x1" 1, "x2" 2, "x3" 3}
+             {"x1" 4, "x2" 5, "x3" 6}
+             {"x1" 7, "x2" 8, "x3" 9}])
+(to-dataset [[1 2 3] 
+             [4 5 6] 
+             [7 8 9]])
+(conj-cols [1 4 7] [2 5 8] [3 6 9])
+(conj-rows [1 2 3] [4 5 6] [7 8 9])
+** Reading Data into Dataset
+(use '(incanter core io))
+(read-dataset "./data/cars.csv" 
+              :header true)
+(read-dataset "./data/cars.tdd" 
+              :header true 
+              :delim \tab)
+(read-dataset "http://bit.ly/aZyjKa" 
+              :header true)
+
+(use 'incanter.datasets)
+(get-dataset :cars)
+
+(use 'incanter.mongodb)
+(use 'somnium.congomongo)
+(mongo! :db "mydb")
+(view (fetch-dataset :cars))
+
+** Saving Datasets
+(use '(incanter core io))
+(save data "./data.csv")
+
+(use '(incanter core mongodb))
+(use 'somnium.congomongo)
+(mongo! :db "mydb")
+(insert-dataset :cars data)
+
+** Column selection
+($ :column the-data)
+
+** Row selection
+(use '(incanter core datasets))
+($where {"Species" "setosa"} 
+        (get-dataset :iris))
+($where {"Petal.Width" {:gt 1.0, :lt 1.5}} 
+        (get-dataset :iris))
+($where {"Petal.Width" {:gt 1.0, :lt 1.5}
+         "Species" {:in #{"virginica" "setosa"}}}
+        (get-dataset :iris))
+($where (fn [row] 
+          (or (< (row "Petal.Width") 1.0)
+              (> (row "Petal.Length") 5.0)))
+        (get-dataset :iris))  
+** Sorting
+(use '(incanter core datasets))
+(with-data (get-dataset :hair-eye-color)
+  (view $data)
+  (view ($order :count :desc))
+  (view ($order [:hair :eye] :desc)))
+** Rolling up data
+(use '(incanter core datasets stats))
+;; mean petal-length by species
+(->> (get-dataset :iris)
+     ($rollup mean :Petal.Length :Species)
+     view)
+;; standard error of petal-length
+(->> (get-dataset :iris)
+     ($rollup #(/ (sd %) (count %)) 
+              :Petal.Length :Species)
+     view)
+;; sum of people with each hair/eye color combination
+(->> (get-dataset :hair-eye-color)
+     ($rollup sum :count [:hair :eye])
+     ($order :count :desc)
+     view)
+
+* Plotting
+** Scatter
+(view (scatter-plot :Sepal.Length :Sepal.Width 
+                    :data (get-dataset :iris)))
+;; group by species
+(view (scatter-plot :Sepal.Length :Sepal.Width 
+                    :data (get-dataset :iris)
+                    :group-by :Species))
+;; change chart title & axes labels
+(view (scatter-plot :Sepal.Length :Sepal.Width 
+                    :data (get-dataset :iris)
+                    :group-by :Species
+                    :title "Fisher Iris Data"
+                    :x-label "Sepal Length (cm)"
+                    :y-label "Sepal Width (cm)"))
+** Saving
+;; to png file
+(save (scatter-plot :Sepal.Length :Sepal.Width 
+                    :data (get-dataset :iris)
+                    :group-by :Species
+                    :title "Fisher Iris Data"
+                    :x-label "Sepal Length (cm)"
+                    :y-label "Sepal Width (cm)")
+      "./iris-plot.png")
+;; to output stream
+(def output-stream (java.io.ByteArrayOutputStream.))
+(save (scatter-plot :Sepal.Length :Sepal.Width 
+                    :data (get-dataset :iris)
+                    :group-by :Species
+                    :title "Fisher Iris Data"
+                    :x-label "Sepal Length (cm)"
+                    :y-label "Sepal Width (cm)")
+      output-stream)
+;; to pdf file
+(use 'incanter.pdf)
+(save-pdf (scatter-plot :Sepal.Length :Sepal.Width 
+                        :data (get-dataset :iris)
+                        :group-by :Species
+                        :title "Fisher Iris Data"
+                        :x-label "Sepal Length (cm)"
+                        :y-label "Sepal Width (cm)")
+      "./iris-plot.pdf")
+** Adding linear model
+(use '(incanter core charts datasets stats))
+(with-data (get-dataset :iris)
+  (let [lm (linear-model ($ :Petal.Length) ($ :Petal.Width))] ;; <<<<
+    (doto (scatter-plot :Petal.Width :Petal.Length
+                        :data ($where {"Petal.Length" {:lte 2.0} 
+                                       "Petal.Width" {:lt 0.75}}))
+          (add-points :Petal.Width :Petal.Length
+                      :data ($where {"Petal.Length" {:gt 2.0}
+                                     "Petal.Width" {:gte 0.75}}))
+          (add-lines :Petal.Width (:fitted lm)) ;; <<<<
+          view)))
+** Function plot
+(use '(incanter core charts optimize))
+(defn cubic [x] (+ (* x x x) (* 2 x x) (* 2 x) 3))
+(doto (function-plot cubic -10 10)
+      (add-function (derivative cubic) -10 10)  ;; <<<
+      (add-function #(* 1000 (sin %)) -10 10)   ;; using shorthand
+      view)
+** Other charts
+bar-chart, line-chart, xy-plot
+** Rollup & grouping
+;; bar-chart grouped by eye color
+(with-data ($rollup :mean :count [:hair :eye] 
+                    (get-dataset :hair-eye-color))
+  (view $data)
+  (view (bar-chart :hair :count     ;; <<< or line-chart
+                   :group-by :eye 
+                   :legend true)))
+** Histograms
+(use '(incanter core charts stats))
+(doto (histogram (sample-gamma 1000)
+                 :density true 
+                 :nbins 30)
+      
+      view)
+** Box Plots
+(use '(incanter core datasets))
+(with-data (get-dataset :iris)
+  (view (box-plot :Petal.Width 
+    :group-by :Species)))
+** Annotating Charts
+(use '(incanter core charts))
+(doto (function-plot sin -10 10)
+  (add-text 0 0 "text at (0,0)")
+  (add-pointer (- Math/PI) (sin (- Math/PI)) 
+               :text "pointer at (sin -pi)")
+  (add-pointer Math/PI (sin Math/PI) 
+               :text "pointer at(sin pi)" 
+               :angle :ne)
+  (add-pointer (* 1/2 Math/PI) (sin (* 1/2 Math/PI)) 
+               :text "pointer at(sin pi/2)" 
+               :angle :south)
+  view)
+
+* Resources
+** Learn more
+Visit http://incanter.org
+Visit http://data-sorcery.org
+** Join the community and contribute
+Join the Google group: http://groups.google.com/group/incanter
+Follow Incanter on Github: http://github.com/liebke/incanter
+Follow @liebke on Twitter
+** Get the slides and code from this presentation
+http://incanter.org/docs/data-sorcery-light-new.pdf
+http://data-sorcery.org/2010/02/11/data-sorcery-pt1

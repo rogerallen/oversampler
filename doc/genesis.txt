@@ -1,0 +1,153 @@
+There are a variety of issues raised in the thread and this could
+evolve into a project with several interesting aspects.  Below, I try
+to organize the ideas a bit & see what falls out.  I came up with this
+in a couple hours, so it would be interesting to hear from people who
+have more experience or expertise in this kind of thing. Is this how
+professional programs like Reason do it?
+
+To me, there seem to be four separate areas of concern:
+1) the Raw Samples,
+2) the Sample Meta Information to make them useful
+3) the ready-to-be-played samples in the Sample Bank, and
+4) the active samples played via the Sample Player
+
+This separation of concerns allows some interesting & flexible
+combinations here--a violin-style playback engine coupled with a
+Sample Bank filled with piano samples.  A lite version could be
+described with a meta file with only mono samples, while a heavier
+version meta file could have each note with soft/med/loud versions,
+plus some string noise.  Perhaps the user paid for a sample-pack with
+some copyrighted piano samples they would like to use locally.  
+
+Could we make this kind of flexibility possible?
+
+This note got rather long, I hope it isn't too overwhelming...
+
+======================================================================
+
+The Raw Samples 
+
+Samples need a processing pipeline in order to be useful.  If it is
+simple, then we can enable many people to contribute.  They don't need
+to be experts.
+
+* download from uiowa
+* convert to wav
+* add README type info, make sure proper credit is given
+* packaging for freesound.
+* upload to freesound.
+
+It would also be nice if the raw samples came from "sample packs" or
+other files we can purchase.
+
+questions/issues:
+* can we really get away with little/no processing?
+* do we need to convert from aiff -> wav?
+* let's design the rest of the sampling process to deal with multiple
+  notes per file.
+* what kind of naming conventions should we follow?  Perhaps it is
+  best to just leave the files as close to original names as possible?
+* review current freesound interface to see if it needs updates
+
+======================================================================
+
+Sample Meta Information
+
+We need to do analysis to find out some meta-information and describe
+how the samples are to be used.  Storing this separately from the
+samples allows us to change sample banks in a "lightweight" process.
+
+It would be very flexible if we could make the samples ready for play
+as part of the loading-for-use process, rather than adjusting them
+before uploading to freesound.  
+
+This also has the benefit of making any processing very explicit for
+documentation and future extension--no guessing about what the sample
+uploader did to the raw samples.
+
+I hope that we can store this information as standard clojure code
+rather than YAML, XML or JSON.
+
+questions/issues:
+* proposals for a "format" or "api"?
+
+======================================================================
+
+Sample Bank
+
+This is to provide a distinction between all the samples that could
+possibly be played and the samples that are being actively played.
+
+On loading from raw samples we need to consume the analysis output 
+information: (per Kevin)
+* start/end time alignment across all pp/mf/ff notes
+* normalization within a set of pp/mf/ff notes
+* optional fade-in
+* perhaps even some lightweight filtering (remove clicks/pops?)
+Which seems to me to be nicely described by some pipelineable commands: (for example)
+
+(-> get-sample-data "freesound_id#"
+    select-samples :from 38 :to 128678
+    normalize :factor 1.37
+    fade-in :delay 0.001)
+
+We would not want this to take too much time, but this is something
+that does not need to be real-time. I think this process would give us
+our "ready-to-play" samples within Overtone.
+
+In the SampleBank, there may be:
+** stereo samples per note
+** mono samples.  Use pan2 + meta info to simulate
+** sparse note sampling.  Using "C4" derive "C#4" and "D4"
+** multiple versions of notes pp/mf/ff versions 
+** associated "noise" or "ambience" samples
+
+So, we need to find a way to communicate this with the next step.
+
+One thing to do for memory constraints is to get parameters to
+describe range of notes that are required from the user.  Perhaps they
+will only need 1 octave of samples?
+
+questions/issues:
+* proposals for a protocol?
+
+======================================================================
+
+Sample Playback
+
+For the samples that are being played, there is both the separate
+notes played together in chords and otherwise overlapping sounds
+(normal polyphony) and the blending of different wave files & noises,
+etc. to produce a single voiced note.
+
+We could allow any number of playback buffers and only let silence
+remove the buffer.  But, for both memory or for performance accuracy
+reasons, during playback we can limit polyphony to N active buffers.
+Then it is the "replacement policy" where we need some decisions 
+that match the particular instrument in question.
+
+* on piano: 10 total active buffers and one streaming buffer per note
+  seems potentially reasonable
+* on stringed inst: one active buffer per string
+* on woodwind/brass: one voice only
+
+The encoding meta information to describe what should be done:
+** looping points when holding a note.
+** controls for blending between pp/mf/ff notes
+** also describe addition of ambient noise, string noise, etc.
+** not reinvent the wheel? what parameters are useful?
+
+This would be the part that interfaces :note-on, :note-off :control
+types of user input.
+
+questions/issues:
+* proposals for a protocol?
+
+======================================================================
+
+Hoping this sparks some ideas...
+
+--Roger
+
+
+

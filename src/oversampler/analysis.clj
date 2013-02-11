@@ -17,6 +17,7 @@
 
 (def NUM-GRAPH-POINTS 500) ;; to not overload incanter graphs, reduce # samples
 
+
 (defn rms
   "root mean square of sequence of floats."
   [xs]
@@ -27,7 +28,7 @@
 ;; tried a custom version to get rid of wrapping map-indexed & got nothing
 (defn abss
   "max absolute value of sequence of floats."
-  [xs]
+  [^doubles xs] ;; tried using only ^doubles here...no speedup.
   (reduce (fn [^double x ^double y] (max x y))
           (map (fn [^double x] (Math/abs x)) xs)))
 
@@ -36,20 +37,36 @@
   [xs]
   (nth (last xs) 0))
 
+;; attempting to do my own leak-dc
+;; https://github.com/supercollider/supercollider/blob/master/server/plugins/FilterUGens.cpp#L1543
+;; this cleans up the sample really nicely & cost almost nothing
+(defn leak-dc-samples
+  [^doubles xsa]
+  (let [k 0.995]
+    (dotimes [i0 (dec (dec (count xsa)))] ;; leaves 1st & last sample alone.  FIXME?
+      (let [i1 (inc i0)
+            i2 (inc i1)
+            x0 ^double (aget xsa i0)
+            x1 ^double (aget xsa i1)
+            x2 ^double (aget xsa i2)
+            y (+ (* 0.95 x0) (- x2 x1))]
+        (aset xsa i1 y)))
+    xsa))
+
 ;; FIXME -- add version with start/end sample for 'zooming'
 ;; FIXME -- add way to overlay samples?
-(defn view-sample
-  "view the sample in an incanter line graph"
-  [path]
-  (let [the-buffer (o/load-sample path)
-        the-samples (o/buffer-data the-buffer)
-        num-samples (:n-samples (o/buffer-info the-buffer))
-        samples-per-part (int (/ num-samples NUM-GRAPH-POINTS))
-        _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS "points (" samples-per-part "samples/point)")
+(defn view-sample-buffer
+  [the-buffer]
+  (let [the-samples (double-array (o/buffer-data the-buffer))
+        _ (println "applying leak-dc to samples...")
+        the-samples (leak-dc-samples the-samples)
+        num-samples (count the-samples);;(:n-samples (o/buffer-info the-buffer))
+        samples-per-point (int (/ num-samples NUM-GRAPH-POINTS))
+        _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS "points (" samples-per-point "samples/point)")
         fn abss ;; rms
         fn-name "abs" ;; "rms"
-        indexed-fn-per-part (map-indexed vector (map abss (partition samples-per-part the-samples)))
-        fn-dataset (ico/dataset ["t" fn-name] indexed-fn-per-part)]
+        indexed-fn-per-point (map-indexed vector (map abss (partition samples-per-point the-samples)))
+        fn-dataset (ico/dataset ["t" fn-name] indexed-fn-per-point)]
     (doto (ich/xy-plot
            (ico/sel fn-dataset :cols 0)
            (ico/sel fn-dataset :cols 1)
@@ -57,6 +74,10 @@
            :y-label fn-name)
       ;;(ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
       ico/view)))
+(defn view-sample
+  "load the sample & view the sample in an incanter line graph"
+  [path]
+  (view-sample-buffer (o/load-sample path)))
 ;; (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
 
 ;; Grr...out of memory when trying to view the whole thing. Why? 

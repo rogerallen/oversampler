@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies
   [[org.clojure/clojure "1.4.0"]
-   [overtone "0.8.1"]
+   [overtone "0.9.0-SNAPSHOT"]
    ;; When doing analysis, uncomment the Incanter library and the
    ;; analysis use line in core.clj When deploying, comment it out.
    ;; The reason is that Incanter is not necessary for playing samples

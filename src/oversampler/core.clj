@@ -32,6 +32,8 @@
 (defn tbs [[t r]]
     [(/ t 1e9) r])
 
+;; (set! *warn-on-reflection* true)
+
   ;; ============================================================
   ;; do analysis on the raw sound files
   

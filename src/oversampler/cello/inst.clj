@@ -141,6 +141,10 @@
         ;; regular adsr envelope
         env (o/env-gen (o/adsr attack decay sustain release level curve)
                        :gate gate :action o/FREE)
-        the-rate (* rate (o/index:kr (:id note-to-rate-buffer) (+ ofst note)))]
-    (* level env2 env (o/scaled-play-buf 1 the-sample-id :rate the-rate :level 1.0
-                                         :action play-buf-action))))
+        the-rate (* rate (o/index:kr (:id note-to-rate-buffer) (+ ofst note)))
+        the-samples (o/scaled-play-buf 1 the-sample-id :rate the-rate :level 1.0
+                                       :action play-buf-action)
+        ;; the raw cello samples have some crazy low-frequency "issues" that can
+        ;; be filtered with the leak-dc ugen.
+        the-samples (o/leak-dc the-samples 0.995)]
+    (* level env2 env the-samples)))

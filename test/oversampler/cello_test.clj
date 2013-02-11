@@ -15,7 +15,10 @@
   [prompt]
   (= 0 (JOptionPane/showConfirmDialog nil prompt "User Input (Cello Test)" JOptionPane/YES_NO_OPTION)))
 
-(deftest cello-test-1
+;; FYI - after leak-dc added, only 62, 63 and 67 fail "TOO LOUD!!" when played alone
+;; a few more fail when played with sin-osc at the same time.
+
+(deftest ^:cello cello-test-1
   (testing "test the cello"
     (println "testing 3 volumes across all notes")
     (dotimes [l 3]

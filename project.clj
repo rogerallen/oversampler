@@ -18,5 +18,6 @@
    ]
   ;; had to comment this out before "lein install" would work
   ;;:main ^{:skip-aot true} oversampler.core
-  :test-selectors {:quick :quick}
+  :test-selectors {:quick :quick
+                   :cello :cello}
   )

@@ -1,11 +1,12 @@
 (ns oversampler.piano-test
   (:use clojure.test
-        oversampler.piano.inst
-        oversampler.piano.bank
-        overtone.live))
+        overtone.live)
+  (:require [oversampler.piano.inst :as inst]
+            [oversampler.piano.synth :as synth]
+            [oversampler.piano.bank :as bank]))
 
 (println "Setup test piano samples...")
-(time (sampled-piano-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85))
+(time (inst/sampled-piano-init :mf-volume-cutoff 0.75))
 (println "done.")
 
 (import 'javax.swing.JOptionPane)
@@ -25,9 +26,11 @@
           (let [cur-level (nth volumes l)
                 cur-pitch-idx (nth notes i)
                 _ (demo 0.5 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
-                _ (sampled-piano :note cur-pitch-idx :level cur-level)
-                good (ask-user-tf (format "Playing piano sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
-            (println cur-pitch-idx cur-level good)
-            (is good)))))))
+                _ (inst/sampled-piano :note cur-pitch-idx :level cur-level)
+                good-inst (ask-user-tf (format "Playing piano *inst* + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))
+                _ (synth/sampled-piano :note cur-pitch-idx :level cur-level)
+                good-synth (ask-user-tf (format "Playing piano *synth*\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
+            (println cur-pitch-idx cur-level good-inst good-synth)
+            (is (and good-inst good-synth))))))))
   
 

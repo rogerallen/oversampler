@@ -20,29 +20,27 @@
 
 (defn rms
   "root mean square of sequence of floats."
-  [xs]
+  ^double [^doubles xs]
   (Math/sqrt (reduce + (map #(* % %) xs))))
 
 ;; adding the ^double takes this from 18s -> 4s on one view-sample (W00t!)
 ;; continual use seemed to drop this down to < 2s.
 ;; tried a custom version to get rid of wrapping map-indexed & got nothing
 (defn abss
-  "max absolute value of sequence of floats."
-  [^doubles xs] ;; tried using only ^doubles here...no speedup.
-  (reduce (fn [^double x ^double y] (max x y))
-          (map (fn [^double x] (Math/abs x)) xs)))
+  "max absolute value of sequence of doubles."
+  ^double [^doubles xs] ;; tried using only ^doubles here...no speedup.
+  (reduce (fn [^double x ^double y] (max (Math/abs x) (Math/abs y))) xs))
 
 (defn flast
   "like ffirst"
   [xs]
   (nth (last xs) 0))
 
-;; attempting to do my own leak-dc
+;; this leak-dc fix cleans up the sample really nicely & cost almost nothing
 ;; https://github.com/supercollider/supercollider/blob/master/server/plugins/FilterUGens.cpp#L1543
-;; this cleans up the sample really nicely & cost almost nothing
 (defn leak-dc-samples
   [^doubles xsa]
-  (let [k 0.995]
+  (let [k 0.95]
     (dotimes [i0 (dec (dec (count xsa)))] ;; leaves 1st & last sample alone.  FIXME?
       (let [i1 (inc i0)
             i2 (inc i1)
@@ -57,15 +55,14 @@
 ;; FIXME -- add way to overlay samples?
 (defn view-sample-buffer
   [the-buffer]
-  (let [the-samples (double-array (o/buffer-data the-buffer))
-        _ (println "applying leak-dc to samples...")
-        the-samples (leak-dc-samples the-samples)
-        num-samples (count the-samples);;(:n-samples (o/buffer-info the-buffer))
+  (let [_ (println "applying leak-dc to samples...")
+        the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
+        num-samples (count the-samples)
         samples-per-point (int (/ num-samples NUM-GRAPH-POINTS))
         _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS "points (" samples-per-point "samples/point)")
-        fn abss ;; rms
-        fn-name "abs" ;; "rms"
-        indexed-fn-per-point (map-indexed vector (map abss (partition samples-per-point the-samples)))
+        fn rms ;; abss
+        fn-name "rms" ;; "abs"
+        indexed-fn-per-point (map-indexed vector (map fn (partition samples-per-point the-samples)))
         fn-dataset (ico/dataset ["t" fn-name] indexed-fn-per-point)]
     (doto (ich/xy-plot
            (ico/sel fn-dataset :cols 0)
@@ -158,14 +155,15 @@
 (defn find-start-end-zeros
   "given a path to a set of samples, divide the samples up into regions of sound.
    return a [start-sample end-sample] tuple for each region of active sound"
-  [path]
+  [path threshold]
   (let [the-buffer (o/load-sample path)
-        the-samples (o/buffer-data the-buffer)
+        _ (println "applying leak-dc to samples...")
+        the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
         sample-rate (:rate (o/buffer-info the-buffer))
         nsamp (int (/ sample-rate 10)) ;; 10ms divisions
         indexed-rms-10ms (map-indexed vector (map rms (partition nsamp the-samples)))
-        partitioned-rms (filter #(not (zero? (nth (first %) 1)))
-                                (partition-by #(zero? (nth % 1)) indexed-rms-10ms))
+        partitioned-rms (filter #(>= (nth (first %) 1) threshold)
+                                (partition-by #(< (nth % 1) threshold) indexed-rms-10ms))
         start-end-samples (map #(vector (* nsamp (dec (ffirst %)))
                                         (* nsamp (inc (flast %))))
                                partitioned-rms)]

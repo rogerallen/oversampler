@@ -26,7 +26,8 @@ change the global volue via level.  A rate control allows for pitch
 adjustment.  Use gate to turn off the provided ADSR envelope.  By
 default, when the sample goes silent, it causes a FREE of the
 instrument to happen.  However, it can be useful to pass a NO-ACTION
-in order to only have the instrument freed when a :gate 0 happens."
+to the play-buf-action in order to only have the instrument freed when
+a :gate 0 happens."
   [note    {:default 60  :min bank/min-index :max bank/max-index :step 1}
    level   {:default 1.0 :min 0.0 :max 1.0 :step 0.01}
    rate    {:default 1.0 :min 0.5 :max 2.0 :step 0.01}

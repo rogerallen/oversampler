@@ -1,11 +1,11 @@
 (ns oversampler.cello-test
   (:use clojure.test
-        oversampler.cello.inst
-        oversampler.cello.bank
-        overtone.live))
+        overtone.live)
+  (:require [oversampler.cello.inst :as inst]
+            [oversampler.cello.bank :as bank]))
 
 (println "Setup test cello samples...")
-(time (sampled-cello-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85))
+(time (inst/sampled-cello-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85))
 (println "done.")
 
 (import 'javax.swing.JOptionPane)
@@ -22,11 +22,11 @@
   (testing "test the cello"
     (println "testing 3 volumes across all notes")
     (dotimes [l 3]
-      (dotimes [i (inc (- max-index min-index))]
+      (dotimes [i (inc (- bank/max-index bank/min-index))]
         (let [cur-level (nth [0.25 0.5 0.9] l)
-              cur-pitch-idx (+ min-index i)
+              cur-pitch-idx (+ bank/min-index i)
               _ (demo 4 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
-              _ (sampled-cello :note cur-pitch-idx :level cur-level)
+              _ (inst/sampled-cello :note cur-pitch-idx :level cur-level)
               good (ask-user-tf (format "Playing cello sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
           (println cur-pitch-idx cur-level good)
           (is good))))))
@@ -41,7 +41,7 @@
           (let [cur-level (nth volumes l)
                 cur-pitch-idx (nth notes i)
                 _ (demo 0.5 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
-                _ (sampled-cello :note cur-pitch-idx :level cur-level)
+                _ (inst/sampled-cello :note cur-pitch-idx :level cur-level)
                 good (ask-user-tf (format "Playing cello sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
             (println cur-pitch-idx cur-level good)
             (is good)))))))

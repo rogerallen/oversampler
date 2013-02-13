@@ -5,6 +5,9 @@ the [Overtone](http://github.com/overtone/overtone) project.
 
 ## Usage
 
+Sampled instruments are provided in both definst and defsynth flavors.
+Use whichever one you would like.
+
 ### Piano
 
 Uses the same samples that the overtone.inst.sampled-piano uses, but
@@ -14,7 +17,9 @@ samples & overtone's uses just the loud (ff) ones.
 
 Basic use via:
 
-    (use 'oversampler.piano.inst)
+    (use 'oversampler.piano.inst) 
+    *OR*
+    (use 'oversampler.piano.synth)
     (sampled-piano :note 50 :level 0.5)
     
 To get access to 2 sets of samples medium (mf) and loud (ff) you need
@@ -33,6 +38,8 @@ volumes.
 Basic use via:
 
     (use 'oversampler.cello.inst)
+    ;; *OR*
+    (use 'oversampler.cello.synth)
     (sampled-cello :note 50 :level 0.5)
     
 There are 3 sets of samples soft (pp), medium (mf) and loud (ff).  By
@@ -44,6 +51,17 @@ samples, try something like:
     (sampled-cello :note 50 :level 0.5) ;; mf sample
     (sampled-cello :note 50 :level 0.9) ;; ff sample
 
+### Note on/off control
+
+For precise control of both note on & note off, consider using
+explicit gate control of the envelope.  Setting the :play-buf-action
+to NO-ACTION will prevent overtone from complaining if you try to turn
+off a synth that no longer exists.
+
+    (def synth-id (sampled-piano :note 60 :gate 1 :play-buf-action NO-ACTION))
+    ;; ...wait until you get a note-off, then stop the synth....
+    (o/ctl synth-id :gate 0)
+
 ### Analysis
 
 Analysis code is under development & doesn't have any docs.  See
@@ -53,7 +71,7 @@ that's not something normal sample players should need.
 
 ## TODO List
 
-    o cello sounds need review by others for loudness, tuning, etc.
+    o cello sounds need review by others for loudness, timing, tuning, etc.
     o looping
     o needs better docs
     o http://theremin.music.uiowa.edu/MISguitar.html
@@ -61,6 +79,6 @@ that's not something normal sample players should need.
 
 ## License
 
-Copyright © 2012 Roger Allen
+Copyright © 2012, 2013 Roger Allen
 
 Distributed under the Eclipse Public License, the same as Clojure.

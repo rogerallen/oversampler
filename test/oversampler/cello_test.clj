@@ -2,6 +2,7 @@
   (:use clojure.test
         overtone.live)
   (:require [oversampler.cello.inst :as inst]
+            [oversampler.cello.synth :as synth]
             [oversampler.cello.bank :as bank]))
 
 (println "Setup test cello samples...")
@@ -42,7 +43,10 @@
                 cur-pitch-idx (nth notes i)
                 _ (demo 0.5 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
                 _ (inst/sampled-cello :note cur-pitch-idx :level cur-level)
-                good (ask-user-tf (format "Playing cello sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
+                good (ask-user-tf (format "Playing cello *inst* + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))
+                _ (synth/sampled-cello :note cur-pitch-idx :level cur-level)
+                good (ask-user-tf (format "Playing cello *synth*\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))
+                ]
             (println cur-pitch-idx cur-level good)
             (is good)))))))
   

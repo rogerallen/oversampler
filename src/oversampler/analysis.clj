@@ -15,8 +15,8 @@
             [incanter.charts :as ich]
             [oversampler.utils :as osu]))
 
-(def NUM-GRAPH-POINTS 500) ;; to not overload incanter graphs, reduce # samples
-
+;; to not overload incanter graphs, reduce # samples
+(def NUM-GRAPH-POINTS 500) 
 
 (defn rms
   "root mean square of sequence of floats."
@@ -30,6 +30,14 @@
   "max absolute value of sequence of doubles."
   ^double [^doubles xs] ;; tried using only ^doubles here...no speedup.
   (reduce (fn [^double x ^double y] (max (Math/abs x) (Math/abs y))) xs))
+
+;; disappointing that I have to in-line the abss function.  runs out of memory otherwise
+;; dBs is definitely the right way to look at things, though.  it really separates out
+;; the silence from the signal.
+(defn dbss
+  "max db sequence of doubles. 20*log10(max(x))"
+  ^double [^doubles xs]
+  (* 20.0 (Math/log10 (reduce (fn [^double x ^double y] (max (Math/abs x) (Math/abs y))) xs))))
 
 (defn flast
   "like ffirst"
@@ -60,22 +68,27 @@
         num-samples (count the-samples)
         samples-per-point (int (/ num-samples NUM-GRAPH-POINTS))
         _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS "points (" samples-per-point "samples/point)")
-        fn rms ;; abss
-        fn-name "rms" ;; "abs"
-        indexed-fn-per-point (map-indexed vector (map fn (partition samples-per-point the-samples)))
-        fn-dataset (ico/dataset ["t" fn-name] indexed-fn-per-point)]
+        fn dbss ;; dbss ;; rms ;; abss
+        fn-name "dBs" ;; "dBs" ;;"rms" ;; "abs"
+        ;;indexed-fn-per-point (map-indexed vector (map fn (partition samples-per-point the-samples)))
+        fn-dataset (ico/dataset ["t" fn-name] (map-indexed vector (map fn (partition samples-per-point the-samples))))
+        ;;_ (println (take 50 (ico/sel fn-dataset :cols 1)))
+        ]
     (doto (ich/xy-plot
            (ico/sel fn-dataset :cols 0)
            (ico/sel fn-dataset :cols 1)
            :x-label "reduced samples"
            :y-label fn-name)
+      (ich/set-y-range -120 0) ;; for dB chart
       ;;(ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
       ico/view)))
 (defn view-sample
   "load the sample & view the sample in an incanter line graph"
   [path]
   (view-sample-buffer (o/load-sample path)))
-;; (view-sample "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif")
+;; (def s1 (o/load-sample "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif"))
+;; (view-sample-buffer s1)
+
 
 ;; Grr...out of memory when trying to view the whole thing. Why? 
 (defn view-sample-histogram

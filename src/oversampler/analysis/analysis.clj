@@ -13,7 +13,7 @@
   (:require [overtone.live :as o]
             [incanter.core :as ico]
             [incanter.charts :as ich]
-            [oversampler.utils :as osu]))
+            [oversampler.analysis.utils :as osu]))
 
 ;; to not overload incanter graphs, reduce # samples
 (def NUM-GRAPH-POINTS 500) 

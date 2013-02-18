@@ -67,27 +67,30 @@
         the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
         num-samples (count the-samples)
         samples-per-point (int (/ num-samples NUM-GRAPH-POINTS))
-        _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS "points (" samples-per-point "samples/point)")
+        _ (println "reducing" num-samples "samples to" NUM-GRAPH-POINTS
+                   "points (" samples-per-point "samples/point)")
         fn dbss ;; dbss ;; rms ;; abss
-        fn-name "dBs" ;; "dBs" ;;"rms" ;; "abs"
+        fn-name "dB" ;; "dB" ;;"rms" ;; "abs"
         ;;indexed-fn-per-point (map-indexed vector (map fn (partition samples-per-point the-samples)))
         fn-dataset (ico/dataset ["t" fn-name] (map-indexed vector (map fn (partition samples-per-point the-samples))))
         ;;_ (println (take 50 (ico/sel fn-dataset :cols 1)))
         ]
-    (doto (ich/xy-plot
-           (ico/sel fn-dataset :cols 0)
-           (ico/sel fn-dataset :cols 1)
-           :x-label "reduced samples"
-           :y-label fn-name)
-      (ich/set-y-range -120 0) ;; for dB chart
+    (let [the-plot (ich/xy-plot
+                    (ico/sel fn-dataset :cols 0)
+                    (ico/sel fn-dataset :cols 1)
+                    :x-label "reduced samples"
+                    :y-label fn-name)]
+      (ich/set-y-range the-plot -80 0) ;; for dB chart
       ;;(ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
-      ico/view)))
-(defn view-sample
+      (ico/view the-plot)
+      the-plot)))
+(defn view-sample-file
   "load the sample & view the sample in an incanter line graph"
   [path]
   (view-sample-buffer (o/load-sample path)))
 ;; (def s1 (o/load-sample "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif"))
-;; (view-sample-buffer s1)
+;; (def g1 (view-sample-buffer s1))
+;; (ich/add-lines g1 [0 500] [-31 -31])
 
 
 ;; Grr...out of memory when trying to view the whole thing. Why? 
@@ -167,19 +170,20 @@
 ;; using the zeros between notes, divide up the samples into single notes
 (defn find-start-end-zeros
   "given a path to a set of samples, divide the samples up into regions of sound.
-   return a [start-sample end-sample] tuple for each region of active sound"
+   return a [start-sample end-sample] tuple for each region of active sound.  The
+   threshold is in dB so it will be a negative number."
   [path threshold]
   (let [the-buffer (o/load-sample path)
         _ (println "applying leak-dc to samples...")
         the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
         sample-rate (:rate (o/buffer-info the-buffer))
         nsamp (int (/ sample-rate 10)) ;; 10ms divisions
-        indexed-rms-10ms (map-indexed vector (map rms (partition nsamp the-samples)))
-        partitioned-rms (filter #(>= (nth (first %) 1) threshold)
-                                (partition-by #(< (nth % 1) threshold) indexed-rms-10ms))
+        indexed-dB-10ms (map-indexed vector (map dbss (partition nsamp the-samples)))
+        partitioned-dB (filter #(>= (nth (first %) 1) threshold)
+                                (partition-by #(< (nth % 1) threshold) indexed-dB-10ms))
         start-end-samples (map #(vector (* nsamp (dec (ffirst %)))
                                         (* nsamp (inc (flast %))))
-                               partitioned-rms)]
+                               partitioned-dB)]
     (vector start-end-samples the-buffer)))
 
 ;; (ico/view
@@ -239,22 +243,74 @@
         (refine-start-end the-buffer sample-start sample-end 0.90 path)
         ))))
 
+;; this is the goal of analysis, printing out this information for use by the
+;; instrument's sample-bank.  You run this when the samples have not been uploaded
+;; to freesound.
+;;
+;; The paths parameter is a vector of vectors describing the sample files
+;;  (print-sample-file-info
+;;   [ [ (note :e2) :mf -31 "./src/oversampler/samples/Guitar.mf.sulE.E2B2.aif"]
+;;     [ (note :c3) :mf -31 "./src/oversampler/samples/Guitar.mf.sulE.C3B3.aif"] ])
+;;
 (defn print-sample-file-info [paths]
-  (doseq [[cur-idx cur-vol cur-path] paths]
+  (doseq [[start-idx cur-vol cur-thresh cur-path] paths]
     (let [ses (find-start-end-ppeak-samples cur-path)]
-      (println (format ";; %d samples starting at %d. %s" (count ses) cur-idx cur-path))
+      (println (format ";; %d samples starting at %d. %s" (count ses) start-idx cur-path))
       (dotimes [i (count ses)]
         (let [[st en pk] (nth ses i)
-              idx (+ cur-idx i)]
-          (println (format "{:index %3d :volume %5.2f :start %8d :end %8d :ppeak %6.4f :path \"%s\"}"
-                           idx cur-vol st en pk cur-path)))))))
+              cur-idx (+ start-idx i)]
+          (println (format "{:index %3d :volume %5.2f :start %8d :end %8d :ppeak %6.4f :path \"%s\" :rate 1.000}"
+                           cur-idx cur-vol st en pk cur-path)))))))
+(comment
+  (print-sample-file-info
+   [ [ (note :e2) :mf -31 12 "./src/oversampler/samples/Guitar.mf.sulE.E2B2.aif"]
+     [ (note :c3) :mf -31 12 "./src/oversampler/samples/Guitar.mf.sulE.C3B3.aif"] ])
+ )
 
 ;; ======================================================================
+;; mem debug stuff I found on the web
+(defn- as-megabytes
+  "Given a sequence of byte amounts, return megabyte amounts
+   as string, with an M suffix."
+  [memory]
+  (map #(str (int (/ % 1024 1024)) "M") memory))
+
+(defn- as-percentage
+  "Given a pair of values, return the percentage as a string."
+  [[a b]]
+  (str (int (* 100 (/ a b))) "%"))
+
+(defn- memory-bean
+  "Return the MemoryMXBean."
+  []
+  (java.lang.management.ManagementFactory/getMemoryMXBean))
+
+(defn- heap-usage
+  "Given a MemoryMXBean, return the heap memory usage."
+  [^java.lang.management.MemoryMXBean bean]
+  (.getHeapMemoryUsage bean))
+
+(defn- heap-used-max
+  "Given heap memory usage, return a pair of used/max values."
+  [^java.lang.management.MemoryUsage usage]
+  [(.getUsed usage) (.getMax usage)])
+
+(defn memory-usage
+  "Return percentage, used, max heap as strings."
+  []
+  (let [used-max (-> (memory-bean) (heap-usage) (heap-used-max))]
+    (cons (as-percentage used-max)
+          (as-megabytes used-max))))
+
+;; ======================================================================
+
+
 (comment
 
-  (require '[overtone.live :as o]
-           '[incanter.core :as ico]
-           '[incanter.charts :as ich]
-           '[oversampler.utils :as osu])
-
+  (use 'oversampler.analysis)
+  (ns oversampler.analysis)
+  
+  (def s1 (o/load-sample "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif"))
+  (view-sample-buffer s1)
+   
   )

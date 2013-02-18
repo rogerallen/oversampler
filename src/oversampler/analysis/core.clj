@@ -1,8 +1,6 @@
 (ns oversampler.core
   ;; comment on deploy
-  (:use [oversampler.analysis]
-        [criterium.core])
-  )
+  (:use [oversampler.analysis]))
 
 (defn -main
   "Not sure what to do about this..."

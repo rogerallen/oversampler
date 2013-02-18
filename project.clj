@@ -13,11 +13,11 @@
    ;; with quil, for example).  {and this seems better than having 2
    ;; repositories.  at least for now}
    [incanter "1.4.1"] ;; was 1.2.3-SNAPSHOT
-   ;; Another library for analysis.
-   [criterium "0.3.1"]
    ]
   ;; had to comment this out before "lein install" would work
   ;;:main ^{:skip-aot true} oversampler.core
   :test-selectors {:quick :quick
                    :cello :cello}
+  ;; okay 128M is not enough when you have 40M files
+  :jvm-opts [ "-Xms512m" "-Xmx1g" ]
   )

@@ -1,4 +1,4 @@
-(ns oversampler.utils)
+(ns oversampler.analysis.utils)
 
 ;; ======================================================================
 ;; histogram functions

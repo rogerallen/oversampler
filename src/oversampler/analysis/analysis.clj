@@ -9,7 +9,7 @@
 ;; then take that output & use it in cello/bank.clj
 ;; hopefully this will also work for other instruments & not just the cello.
 ;;
-(ns oversampler.analysis
+(ns oversampler.analysis.analysis
   (:require [overtone.live :as o]
             [incanter.core :as ico]
             [incanter.charts :as ich]

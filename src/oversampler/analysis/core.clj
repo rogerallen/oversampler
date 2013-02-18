@@ -1,4 +1,4 @@
-(ns oversampler.core
+(ns oversampler.analysis.core
   ;; comment on deploy
   (:use [oversampler.analysis]))
 

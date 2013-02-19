@@ -17,7 +17,8 @@
   ;; had to comment this out before "lein install" would work
   ;;:main ^{:skip-aot true} oversampler.core
   :test-selectors {:quick :quick
-                   :cello :cello}
+                   :cello :cello
+                   :ektara :ektara}
   ;; okay 128M is not enough when you have 40M files
   :jvm-opts [ "-Xms512m" "-Xmx1g" ]
   )

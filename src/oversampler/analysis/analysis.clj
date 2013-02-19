@@ -1,13 +1,15 @@
 ;;
-;; code for the analysis of raw input files for the purpose of creating meta information to use when
-;; partitioning the raw input into sound banks and controlling the playback of the information.
+;; code for the analysis of raw input files for the purpose of
+;; creating meta information to use when partitioning the raw input
+;; into sound banks and controlling the playback of the information.
 ;;
-;; the code is a bit "ad hoc" at the moment since I've only worked on one set of samples.
+;; the code is a bit "ad hoc" at the moment since I've only worked on
+;; one set of samples.
 ;;
-;; goal of this code is to use this to create the information used by the sampler.
-;; (print-sample-file-info cello-sample-paths)
-;; then take that output & use it in cello/bank.clj
-;; hopefully this will also work for other instruments & not just the cello.
+;; goal of this code is to use this to create the information used by
+;; the sampler.  (print-sample-file-info cello-sample-paths) then take
+;; that output & use it in cello/bank.clj hopefully this will also
+;; work for other instruments & not just the cello.
 ;;
 (ns oversampler.analysis.analysis
   (:require [overtone.live :as o]
@@ -62,7 +64,7 @@
 ;; FIXME -- add version with start/end sample for 'zooming'
 ;; FIXME -- add way to overlay samples?
 (defn view-sample-buffer
-  [the-buffer]
+  [the-buffer sample-name]
   (let [_ (println "applying leak-dc to samples...")
         the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
         num-samples (count the-samples)
@@ -78,21 +80,137 @@
     (let [the-plot (ich/xy-plot
                     (ico/sel fn-dataset :cols 0)
                     (ico/sel fn-dataset :cols 1)
+                    :title sample-name
                     :x-label "reduced samples"
                     :y-label fn-name)]
       (ich/set-y-range the-plot -80 0) ;; for dB chart
       ;;(ich/add-lines (ico/sel max-dataset :cols 0) (ico/sel max-dataset :cols 1))
       (ico/view the-plot)
       the-plot)))
+
 (defn view-sample-file
   "load the sample & view the sample in an incanter line graph"
   [path]
-  (view-sample-buffer (o/load-sample path)))
+  (view-sample-buffer (o/load-sample path) path))
+
 ;; (def s1 (o/load-sample "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif"))
 ;; (def g1 (view-sample-buffer s1))
 ;; (ich/add-lines g1 [0 500] [-31 -31])
 
+(defn max-abs-between
+  "find max absolute value between indices a and b"
+  [a b the-samples]
+  (abss (take b (drop a the-samples))))
 
+(defn refine-sound-above-threshold
+  "given a start, end and threshold for a buffer, refine the start & end point by growing out from the current endpoints to find threshold2"
+  [cur-start cur-end threshold2 indexed-dB-10ms nsamp]
+  (let [cur-start-index (/ cur-start nsamp)
+        cur-end-index (/ cur-end nsamp)
+        before-dB-seq (take-while #(> (second %) threshold2)
+                                  (reverse (take (inc cur-start-index) indexed-dB-10ms)))
+        after-dB-seq (take-while #(> (second %) threshold2)
+                                 (drop cur-end-index indexed-dB-10ms))
+        ]
+    ;;(swank.core/break)
+    (vector (* nsamp (flast before-dB-seq))
+            (* nsamp (flast after-dB-seq)))))
+
+(defn sound-above-threshold
+  "given a buffer for a set of samples, divide the samples up into
+regions of sound above a threshold, separate from regions of sound
+below a threshold.  return a [start-sample end-sample] tuple for each
+region of active sound.  The threshold is in dB so it will be a
+negative number."
+  [threshold1 threshold2 the-buffer the-samples]
+  (let [sample-rate (:rate (o/buffer-info the-buffer))
+        nsamp (int (/ sample-rate 10)) ;; 10ms divisions
+        indexed-dB-10ms (map-indexed vector (map dbss (partition nsamp the-samples)))
+        partitioned-dB (filter #(>= (nth (first %) 1) threshold1)
+                                (partition-by #(< (nth % 1) threshold1) indexed-dB-10ms))
+        start-end-samples (map #(vector (* nsamp (ffirst %))
+                                        (* nsamp (flast %)))
+                               partitioned-dB)]
+    (for [[cur-start cur-end] start-end-samples]
+      (let [max-abs (max-abs-between cur-start cur-end the-samples)]
+        (conj (refine-sound-above-threshold cur-start cur-end threshold2 indexed-dB-10ms nsamp)
+              max-abs)))))
+
+(defn find-start-end-peak-samples
+  "given a path to a set of samples, divide the samples up into
+   regions of sound that have a synchronized starting point.  Also
+   return the peak abs value of the sound."
+  [db-thresh-hi db-thresh-lo path]
+  (let [the-buffer (o/load-sample path)
+        the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
+        start-end-sample-map (sound-above-threshold db-thresh-hi db-thresh-lo the-buffer the-samples)]
+    start-end-sample-map))
+
+;; this is the goal of analysis, printing out this information for use by the
+;; instrument's sample-bank.  You run this when the samples have not been uploaded
+;; to freesound.
+;;
+;; The paths parameter is a vector of vectors describing the sample files
+;;  (print-sample-file-info
+;;   [ [ (note :e2) :mf -31 -40 "./src/oversampler/samples/Guitar.mf.sulE.E2B2.aif"]
+;;     [ (note :c3) :mf -31 -40 "./src/oversampler/samples/Guitar.mf.sulE.C3B3.aif"] ])
+;;
+(defn print-sample-file-info [paths]
+  (doseq [[start-idx cur-vol db-thresh-hi db-thresh-lo cur-path] paths]
+    (let [ses (find-start-end-peak-samples db-thresh-hi db-thresh-lo cur-path)]
+      (println (format ";; %d samples starting at %d. %s" (count ses) start-idx cur-path))
+      (dotimes [i (count ses)]
+        (let [[st en pk] (nth ses i)
+              cur-idx (+ start-idx i)]
+          (println (format "{:index %3d :volume %s :start %8d :end %8d :peak %6.4f :path \"%s\" :rate 1.000}"
+                           cur-idx cur-vol st en pk cur-path)))))))
+
+(comment
+  ;; test out on one file
+  (print-sample-file-info
+   [ [ (o/note :a3) :ff -31 -40 "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif"]
+     ])
+ )
+
+;; ======================================================================
+;; mem debug stuff I found on the web
+(defn- as-megabytes
+  "Given a sequence of byte amounts, return megabyte amounts
+   as string, with an M suffix."
+  [memory]
+  (map #(str (int (/ % 1024 1024)) "M") memory))
+
+(defn- as-percentage
+  "Given a pair of values, return the percentage as a string."
+  [[a b]]
+  (str (int (* 100 (/ a b))) "%"))
+
+(defn- memory-bean
+  "Return the MemoryMXBean."
+  []
+  (java.lang.management.ManagementFactory/getMemoryMXBean))
+
+(defn- heap-usage
+  "Given a MemoryMXBean, return the heap memory usage."
+  [^java.lang.management.MemoryMXBean bean]
+  (.getHeapMemoryUsage bean))
+
+(defn- heap-used-max
+  "Given heap memory usage, return a pair of used/max values."
+  [^java.lang.management.MemoryUsage usage]
+  [(.getUsed usage) (.getMax usage)])
+
+(defn memory-usage
+  "Return percentage, used, max heap as strings."
+  []
+  (let [used-max (-> (memory-bean) (heap-usage) (heap-used-max))]
+    (cons (as-percentage used-max)
+          (as-megabytes used-max))))
+
+;; ======================================================================
+;; older code
+(comment
+  
 ;; Grr...out of memory when trying to view the whole thing. Why? 
 (defn view-sample-histogram
   "view the histogram of a sample"
@@ -167,25 +285,6 @@
       the-plot
     ))
 
-;; using the zeros between notes, divide up the samples into single notes
-(defn find-start-end-zeros
-  "given a path to a set of samples, divide the samples up into regions of sound.
-   return a [start-sample end-sample] tuple for each region of active sound.  The
-   threshold is in dB so it will be a negative number."
-  [path threshold]
-  (let [the-buffer (o/load-sample path)
-        _ (println "applying leak-dc to samples...")
-        the-samples (leak-dc-samples (double-array (o/buffer-data the-buffer)))
-        sample-rate (:rate (o/buffer-info the-buffer))
-        nsamp (int (/ sample-rate 10)) ;; 10ms divisions
-        indexed-dB-10ms (map-indexed vector (map dbss (partition nsamp the-samples)))
-        partitioned-dB (filter #(>= (nth (first %) 1) threshold)
-                                (partition-by #(< (nth % 1) threshold) indexed-dB-10ms))
-        start-end-samples (map #(vector (* nsamp (dec (ffirst %)))
-                                        (* nsamp (inc (flast %))))
-                               partitioned-dB)]
-    (vector start-end-samples the-buffer)))
-
 ;; (ico/view
 ;;   (ich/histogram
 ;;     (ico/sel (ico/dataset ["x"] [1 2 3 4 5 1 2 4]) :col 0) :nbins 100))
@@ -231,86 +330,4 @@
             (- end-sample end-offset)
             pctile-peak-val)))
 
-(defn find-start-end-ppeak-samples
-  "given a path to a set of samples, divide the samples up into
-   regions of sound that have a synchronized starting point.  Also
-   return the 90th percentile peak abs value of the sound."
-  [path]
-  (let [[start-end-sample-map the-buffer] (find-start-end-zeros path)]
-    (for [[sample-start sample-end] start-end-sample-map]
-      (do
-        ;;(println "SE" sample-start sample-end) (flush)
-        (refine-start-end the-buffer sample-start sample-end 0.90 path)
-        ))))
-
-;; this is the goal of analysis, printing out this information for use by the
-;; instrument's sample-bank.  You run this when the samples have not been uploaded
-;; to freesound.
-;;
-;; The paths parameter is a vector of vectors describing the sample files
-;;  (print-sample-file-info
-;;   [ [ (note :e2) :mf -31 "./src/oversampler/samples/Guitar.mf.sulE.E2B2.aif"]
-;;     [ (note :c3) :mf -31 "./src/oversampler/samples/Guitar.mf.sulE.C3B3.aif"] ])
-;;
-(defn print-sample-file-info [paths]
-  (doseq [[start-idx cur-vol cur-thresh cur-path] paths]
-    (let [ses (find-start-end-ppeak-samples cur-path)]
-      (println (format ";; %d samples starting at %d. %s" (count ses) start-idx cur-path))
-      (dotimes [i (count ses)]
-        (let [[st en pk] (nth ses i)
-              cur-idx (+ start-idx i)]
-          (println (format "{:index %3d :volume %5.2f :start %8d :end %8d :ppeak %6.4f :path \"%s\" :rate 1.000}"
-                           cur-idx cur-vol st en pk cur-path)))))))
-(comment
-  (print-sample-file-info
-   [ [ (note :e2) :mf -31 12 "./src/oversampler/samples/Guitar.mf.sulE.E2B2.aif"]
-     [ (note :c3) :mf -31 12 "./src/oversampler/samples/Guitar.mf.sulE.C3B3.aif"] ])
- )
-
-;; ======================================================================
-;; mem debug stuff I found on the web
-(defn- as-megabytes
-  "Given a sequence of byte amounts, return megabyte amounts
-   as string, with an M suffix."
-  [memory]
-  (map #(str (int (/ % 1024 1024)) "M") memory))
-
-(defn- as-percentage
-  "Given a pair of values, return the percentage as a string."
-  [[a b]]
-  (str (int (* 100 (/ a b))) "%"))
-
-(defn- memory-bean
-  "Return the MemoryMXBean."
-  []
-  (java.lang.management.ManagementFactory/getMemoryMXBean))
-
-(defn- heap-usage
-  "Given a MemoryMXBean, return the heap memory usage."
-  [^java.lang.management.MemoryMXBean bean]
-  (.getHeapMemoryUsage bean))
-
-(defn- heap-used-max
-  "Given heap memory usage, return a pair of used/max values."
-  [^java.lang.management.MemoryUsage usage]
-  [(.getUsed usage) (.getMax usage)])
-
-(defn memory-usage
-  "Return percentage, used, max heap as strings."
-  []
-  (let [used-max (-> (memory-bean) (heap-usage) (heap-used-max))]
-    (cons (as-percentage used-max)
-          (as-megabytes used-max))))
-
-;; ======================================================================
-
-
-(comment
-
-  (use 'oversampler.analysis)
-  (ns oversampler.analysis)
-  
-  (def s1 (o/load-sample "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif"))
-  (view-sample-buffer s1)
-   
-  )
+) ; end comment

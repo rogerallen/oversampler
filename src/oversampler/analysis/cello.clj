@@ -50,5 +50,14 @@
           g1 (view-sample-buffer s1)]
       (ich/add-lines g1 [0 500] [db1 db1])
       (ich/add-lines g1 [0 500] [db2 db2])))
-  
+
+  ;; now you want to get a list of sample-info via
+  (print-sample-file-info temp-sample-path-info)
+
+  ;; take the std-output and put that into cello/bank.clj/sample-info-list
+
+  ;; remember to change the :path to use (find-sample-path ...) in
+  ;; order to get data from freesound.
   )
+
+

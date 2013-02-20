@@ -14,8 +14,6 @@
    ;; repositories.  at least for now}
    [incanter "1.4.1"] ;; was 1.2.3-SNAPSHOT
    ]
-  ;; had to comment this out before "lein install" would work
-  ;;:main ^{:skip-aot true} oversampler.core
   :test-selectors {:quick :quick
                    :cello :cello
                    :ektara :ektara}

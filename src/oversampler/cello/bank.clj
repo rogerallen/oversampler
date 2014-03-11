@@ -1,8 +1,7 @@
 ;;
-;; code describing the individual sampled notes from the raw samples.
+;; code describing the sample bank containing the per-note samples.
 ;;
 (ns oversampler.cello.bank
-  (:use [oversampler.utils])
   (:require [overtone.live :as o]))
 
 ;;(freesound-searchm [:id] "Cello" :f "pack:MIS.Cello2012.Arco.Mono")
@@ -67,6 +66,168 @@
   ;; NOTE: commented out samples above index 68.  They were not as
   ;; good as the notes below.
   [
+(comment
+   ;; 12 samples starting at 57. ./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif
+{:index  57 :volume :ff :start    97020 :end   242550 :peak 0.1716 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  58 :volume :ff :start   427770 :end   542430 :peak 0.2167 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  59 :volume :ff :start   758520 :end   877590 :peak 0.2798 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  60 :volume :ff :start  1084860 :end  1208340 :peak 0.2798 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  61 :volume :ff :start  1397970 :end  1512630 :peak 0.2798 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  62 :volume :ff :start  1724310 :end  1843380 :peak 0.2160 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  63 :volume :ff :start  2063880 :end  2174130 :peak 0.2160 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  64 :volume :ff :start  2429910 :end  2548980 :peak 0.2160 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  65 :volume :ff :start  2743020 :end  2853270 :peak 0.2097 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  66 :volume :ff :start  3034080 :end  3135510 :peak 0.2097 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  67 :volume :ff :start  3311910 :end  3426570 :peak 0.2097 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  68 :volume :ff :start  3602970 :end  3713220 :peak 0.2097 :path "./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif" :rate 1.000}
+;; 12 samples starting at 50. ./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif
+{:index  50 :volume :ff :start   136710 :end   282240 :peak 0.1329 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  51 :volume :ff :start   485100 :end   599760 :peak 0.1445 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  52 :volume :ff :start   824670 :end   939330 :peak 0.1759 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  53 :volume :ff :start  1186290 :end  1292130 :peak 0.1759 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  54 :volume :ff :start  1556730 :end  1666980 :peak 0.1888 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  55 :volume :ff :start  1905120 :end  2028600 :peak 0.1888 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  56 :volume :ff :start  2284380 :end  2407860 :peak 0.2422 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  57 :volume :ff :start  2668050 :end  2800350 :peak 0.2422 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  58 :volume :ff :start  3034080 :end  3139920 :peak 0.2422 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  59 :volume :ff :start  3356010 :end  3461850 :peak 0.2422 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  60 :volume :ff :start  3682350 :end  3810240 :peak 0.2422 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  61 :volume :ff :start  3991050 :end  4118940 :peak 0.2422 :path "./src/oversampler/samples/Cello.arco.ff.sulD.D3Db4.mono.aif" :rate 1.000}
+;; 12 samples starting at 43. ./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif
+{:index  43 :volume :ff :start    44100 :end   171990 :peak 0.1971 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  44 :volume :ff :start   471870 :end   612990 :peak 0.1559 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  45 :volume :ff :start   877590 :end  1014300 :peak 0.1439 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  46 :volume :ff :start  1256850 :end  1380330 :peak 0.1439 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  47 :volume :ff :start  1631700 :end  1764000 :peak 0.1282 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  48 :volume :ff :start  2028600 :end  2165310 :peak 0.1885 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  49 :volume :ff :start  2443140 :end  2579850 :peak 0.2455 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  50 :volume :ff :start  2831220 :end  2963520 :peak 0.2455 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  51 :volume :ff :start  3214890 :end  3347190 :peak 0.2455 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  52 :volume :ff :start  3602970 :end  3722040 :peak 0.2455 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  53 :volume :ff :start  3955770 :end  4074840 :peak 0.2455 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  54 :volume :ff :start  4339440 :end  4476150 :peak 0.2455 :path "./src/oversampler/samples/Cello.arco.ff.sulG.G2Gb3.mono.aif" :rate 1.000}
+;; 12 samples starting at 36. ./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif
+{:index  36 :volume :ff :start    97020 :end   255780 :peak 0.2272 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  37 :volume :ff :start   511560 :end   639450 :peak 0.2169 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  38 :volume :ff :start   921690 :end  1049580 :peak 0.1501 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  39 :volume :ff :start  1331820 :end  1446480 :peak 0.1624 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  40 :volume :ff :start  1711080 :end  1825740 :peak 0.1624 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  41 :volume :ff :start  2055060 :end  2165310 :peak 0.1624 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  42 :volume :ff :start  2460780 :end  2579850 :peak 0.2076 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  43 :volume :ff :start  2862090 :end  2972340 :peak 0.2076 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  44 :volume :ff :start  3175200 :end  3298680 :peak 0.2076 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  45 :volume :ff :start  3545640 :end  3660300 :peak 0.2076 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  46 :volume :ff :start  3889620 :end  4004280 :peak 0.2076 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  47 :volume :ff :start  4260060 :end  4387950 :peak 0.2076 :path "./src/oversampler/samples/Cello.arco.ff.sulC.C2B2.mono.aif" :rate 1.000}
+;; 12 samples starting at 57. ./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif
+{:index  57 :volume :mf :start    44100 :end   180810 :peak 0.0877 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  58 :volume :mf :start   326340 :end   449820 :peak 0.0624 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  59 :volume :mf :start   621810 :end   727650 :peak 0.0641 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  60 :volume :mf :start   939330 :end  1058400 :peak 0.0707 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  61 :volume :mf :start  1225980 :end  1331820 :peak 0.0789 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  62 :volume :mf :start  1539090 :end  1649340 :peak 0.0789 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  63 :volume :mf :start  1821330 :end  1935990 :peak 0.0789 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  64 :volume :mf :start  2103570 :end  2209410 :peak 0.0789 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  65 :volume :mf :start  2363760 :end  2478420 :peak 0.0789 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  66 :volume :mf :start  2641590 :end  2751840 :peak 0.0747 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  67 :volume :mf :start  2910600 :end  3025260 :peak 0.0747 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  68 :volume :mf :start  3206070 :end  3320730 :peak 0.0747 :path "./src/oversampler/samples/Cello.arco.mf.sulA.A3Ab4.mono.aif" :rate 1.000}
+;; 12 samples starting at 50. ./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif
+{:index  50 :volume :mf :start    39690 :end   167580 :peak 0.0683 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  51 :volume :mf :start   321930 :end   458640 :peak 0.0634 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  52 :volume :mf :start   626220 :end   767340 :peak 0.0807 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  53 :volume :mf :start   956970 :end  1098090 :peak 0.0807 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  54 :volume :mf :start  1305360 :end  1437660 :peak 0.0807 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  55 :volume :mf :start  1636110 :end  1777230 :peak 0.0715 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  56 :volume :mf :start  1997730 :end  2125620 :peak 0.0858 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  57 :volume :mf :start  2337300 :end  2465190 :peak 0.0858 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  58 :volume :mf :start  2676870 :end  2795940 :peak 0.0858 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  59 :volume :mf :start  2976750 :end  3100230 :peak 0.0858 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  60 :volume :mf :start  3303090 :end  3422160 :peak 0.0858 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  61 :volume :mf :start  3642660 :end  3761730 :peak 0.0858 :path "./src/oversampler/samples/Cello.arco.mf.sulD.D3Db4.mono.aif" :rate 1.000}
+;; 12 samples starting at 43. ./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif
+{:index  43 :volume :mf :start    39690 :end   194040 :peak 0.0951 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  44 :volume :mf :start   392490 :end   560070 :peak 0.0632 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  45 :volume :mf :start   776160 :end   934920 :peak 0.0644 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  46 :volume :mf :start  1146600 :end  1292130 :peak 0.0663 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  47 :volume :mf :start  1490580 :end  1640520 :peak 0.0663 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  48 :volume :mf :start  1825740 :end  1980090 :peak 0.0947 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  49 :volume :mf :start  2218230 :end  2368170 :peak 0.0947 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  50 :volume :mf :start  2571030 :end  2720970 :peak 0.0947 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  51 :volume :mf :start  2919420 :end  3060540 :peak 0.0947 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  52 :volume :mf :start  3232530 :end  3378060 :peak 0.0947 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  53 :volume :mf :start  3572100 :end  3699990 :peak 0.0947 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  54 :volume :mf :start  3942540 :end  4088070 :peak 0.0939 :path "./src/oversampler/samples/Cello.arco.mf.sulG.G2Gb3.mono.aif" :rate 1.000}
+;; 13 samples starting at 36. ./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif
+{:index  36 :volume :mf :start    44100 :end   220500 :peak 0.0705 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  37 :volume :mf :start   524790 :end   674730 :peak 0.0726 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  38 :volume :mf :start   983430 :end  1137780 :peak 0.0734 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  39 :volume :mf :start   983430 :end  1137780 :peak 0.0734 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  40 :volume :mf :start  1428840 :end  1565550 :peak 0.0734 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  41 :volume :mf :start  1865430 :end  2002140 :peak 0.0773 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  42 :volume :mf :start  2253510 :end  2416680 :peak 0.0773 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  43 :volume :mf :start  2690100 :end  2848860 :peak 0.0773 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  44 :volume :mf :start  3082590 :end  3245760 :peak 0.0773 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  45 :volume :mf :start  3483900 :end  3638250 :peak 0.0667 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  46 :volume :mf :start  3863160 :end  4008690 :peak 0.0667 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  47 :volume :mf :start  4242420 :end  4392360 :peak 0.0667 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  48 :volume :mf :start  4731930 :end  4890690 :peak 0.0472 :path "./src/oversampler/samples/Cello.arco.mf.sulC.C2B2.mono.aif" :rate 1.000}
+;; 12 samples starting at 57. ./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif
+{:index  57 :volume :pp :start    48510 :end   154350 :peak 0.0356 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  58 :volume :pp :start   343980 :end   471870 :peak 0.0288 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  59 :volume :pp :start   670320 :end   784980 :peak 0.0269 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  60 :volume :pp :start  1005480 :end  1120140 :peak 0.0325 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  61 :volume :pp :start  1305360 :end  1420020 :peak 0.0325 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  62 :volume :pp :start  1596420 :end  1702260 :peak 0.0334 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  63 :volume :pp :start  1900710 :end  2010960 :peak 0.0349 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  64 :volume :pp :start  2205000 :end  2306430 :peak 0.0349 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  65 :volume :pp :start  2509290 :end  2606310 :peak 0.0349 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  66 :volume :pp :start  2778300 :end  2892960 :peak 0.0349 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  67 :volume :pp :start  3078180 :end  3197250 :peak 0.0349 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+{:index  68 :volume :pp :start  3382470 :end  3497130 :peak 0.0349 :path "./src/oversampler/samples/Cello.arco.pp.sulA.A3Ab4.mono.aif" :rate 1.000}
+;; 12 samples starting at 50. ./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif
+{:index  50 :volume :pp :start    48510 :end   167580 :peak 0.0229 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  51 :volume :pp :start   295470 :end   436590 :peak 0.0388 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  52 :volume :pp :start   573300 :end   723240 :peak 0.0292 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  53 :volume :pp :start   877590 :end  1027530 :peak 0.0459 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  54 :volume :pp :start  1164240 :end  1300950 :peak 0.0459 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  55 :volume :pp :start  1446480 :end  1565550 :peak 0.0459 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  56 :volume :pp :start  1697850 :end  1843380 :peak 0.0275 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  57 :volume :pp :start  1975680 :end  2094750 :peak 0.0269 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  58 :volume :pp :start  2231460 :end  2337300 :peak 0.0244 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  59 :volume :pp :start  2487240 :end  2615130 :peak 0.0244 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  60 :volume :pp :start  2778300 :end  2897370 :peak 0.0244 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+{:index  61 :volume :pp :start  3051720 :end  3157560 :peak 0.0244 :path "./src/oversampler/samples/Cello.arco.pp.sulD.D3Db4.mono.aif" :rate 1.000}
+;; 13 samples starting at 43. ./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif
+{:index  43 :volume :pp :start    66150 :end   216090 :peak 0.0356 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  44 :volume :pp :start   352800 :end   511560 :peak 0.0325 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  45 :volume :pp :start   630630 :end   820260 :peak 0.0280 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  46 :volume :pp :start   930510 :end  1093680 :peak 0.0221 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  47 :volume :pp :start  1199520 :end  1358280 :peak 0.0353 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  48 :volume :pp :start  1199520 :end  1358280 :peak 0.0353 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  49 :volume :pp :start  1450890 :end  1600830 :peak 0.0353 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  50 :volume :pp :start  1724310 :end  1887480 :peak 0.0484 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  51 :volume :pp :start  1988910 :end  2147670 :peak 0.0484 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  52 :volume :pp :start  2235870 :end  2381400 :peak 0.0484 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  53 :volume :pp :start  2482830 :end  2650410 :peak 0.0484 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  54 :volume :pp :start  2760660 :end  2932650 :peak 0.0484 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+{:index  55 :volume :pp :start  3034080 :end  3201660 :peak 0.0484 :path "./src/oversampler/samples/Cello.arco.pp.sulG.G2Gb3.mono.aif" :rate 1.000}
+;; 12 samples starting at 36. ./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif
+{:index  36 :volume :pp :start    44100 :end   216090 :peak 0.0201 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  37 :volume :pp :start   361620 :end   533610 :peak 0.0216 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  38 :volume :pp :start   701190 :end   855540 :peak 0.0251 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  39 :volume :pp :start  1040760 :end  1195110 :peak 0.0461 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  40 :volume :pp :start  1371510 :end  1552320 :peak 0.0461 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  41 :volume :pp :start  1724310 :end  1865430 :peak 0.0461 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  42 :volume :pp :start  2050650 :end  2196180 :peak 0.0461 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  43 :volume :pp :start  2376990 :end  2526930 :peak 0.0347 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  44 :volume :pp :start  2716560 :end  2866500 :peak 0.0291 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  45 :volume :pp :start  3029670 :end  3197250 :peak 0.0291 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  46 :volume :pp :start  3382470 :end  3541230 :peak 0.0291 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+{:index  47 :volume :pp :start  3717630 :end  3854340 :peak 0.0291 :path "./src/oversampler/samples/Cello.arco.pp.sulC.C2B2.mono.aif" :rate 1.000}
+
+)
+
 ;; 12 samples starting at 57. ./src/oversampler/samples/Cello.arco.ff.sulA.A3Ab4.mono.aif
 {:index  57 :volume  :ff :start    88200 :end   383670 :ppeak 0.1103 :path (find-sample-path "Cello.arco.ff.sulA.A3Ab4.mono.aif") :rate 1.000}
 {:index  58 :volume  :ff :start   418950 :end   710010 :ppeak 0.1251 :path (find-sample-path "Cello.arco.ff.sulA.A3Ab4.mono.aif") :rate 1.000}
@@ -410,32 +571,11 @@
         sample-info-map (merge-with concat unique-pp-info unique-mf-info unique-ff-info)]
     sample-info-map))
 
-(defn- adjust-sample
-  "smoothly adjust the samples to start from 0 and end at 0 and have
-  scaled ppeak value matching the buffer-volume"
-  [sample-offset buffer-size buffer-volume buffer-ppeak index value]
-  (let [smooth-value (* value (smoothpulse 0 sample-offset (- buffer-size sample-offset) buffer-size index))
-        scaled-value (* smooth-value (/ buffer-volume buffer-ppeak))]
-    scaled-value))
-
 (defn- load-sample-into-info
   "given an info map of the sample, load & add the sample"
   [x]
   (let [the-size (- (:end x) (:start x))
-        ;; _ (println "load sample..." (:end x) (:start x) (:path x))
-        the-buffer (o/load-sample (:path x) :start (:start x) :size the-size)
-        ;; this is an interesting idea, but takes WAAY too long.  Going to try either:
-        ;; 1) envelope to accomplish the same
-        ;; 2) prepare these samples into files
-        ;; sample-rate (:rate (o/buffer-info the-buffer))
-        ;; sample-offset (int (* 2 (/ sample-rate 10)))
-        ;; ;; adjust the samples to have a smooth start & end.  
-        ;; _ (println "process sample")
-        ;; the-samples (map-indexed #(adjust-sample sample-offset the-size (:volume x) (:ppeak x) %1 %2) (o/buffer-data the-buffer))
-        ;; _ (println "write sample")
-        ;; _ (buffer-write-relay! the-buffer the-samples)
-        ;; _ (println "done.")
-        ]
+        the-buffer (o/load-sample (:path x) :start (:start x) :size the-size)]
     (assoc x :sample the-buffer)))
 
 (defn- load-samples-into-infos

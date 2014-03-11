@@ -30,12 +30,18 @@ freed when a :gate 0 happens."
    play-buf-action o/FREE]
   (let [ofst (o/index:kr (:id bank/level-to-offset-buffer) (o/floor (* 20 level)))
         the-sample-id (o/index:kr (:id bank/note-to-sample-id-buffer) (+ ofst note))
+        the-sample-rate (o/index:kr (:id bank/note-to-rate-buffer) (+ ofst note))
         env (o/env-gen (o/adsr attack decay sustain release level curve)
                        :gate gate :action o/FREE)
         the-samples (o/scaled-play-buf 2 the-sample-id
-                                       :rate rate
+                                       :rate (* the-sample-rate rate)
                                        :level 1.0
                                        :action play-buf-action)]
-    ;; FIXME level needs adjustment
+    ;; FIXME level needs adjustment. Currently 4 coarse levels
     (* ;level
        env the-samples)))
+
+;; (steinway-grand-piano 58 :level 0.2)
+;; (steinway-grand-piano 59 :level 0.6)
+;; (steinway-grand-piano 60 :level 0.2)
+;; (steinway-grand-piano 61 :level 0.6)

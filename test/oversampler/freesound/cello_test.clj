@@ -1,9 +1,9 @@
-(ns oversampler.cello-test
+(ns oversampler.freesound.cello-test
   (:use clojure.test
         overtone.live)
-  (:require [oversampler.cello.inst :as inst]
-            [oversampler.cello.synth :as synth]
-            [oversampler.cello.bank :as bank]))
+  (:require [oversampler.freesound.cello.inst :as inst]
+            [oversampler.freesound.cello.synth :as synth]
+            [oversampler.freesound.cello.bank :as bank]))
 
 (println "Setup test cello samples...")
 (time (inst/sampled-cello-init :pp-volume-cutoff 0.30 :mf-volume-cutoff 0.85))
@@ -49,5 +49,3 @@
                 ]
             (println cur-pitch-idx cur-level good-inst good-synth)
             (is (and good-inst good-synth))))))))
-  
-

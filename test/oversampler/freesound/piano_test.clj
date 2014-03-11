@@ -1,9 +1,9 @@
-(ns oversampler.piano-test
+(ns oversampler.freesound.piano-test
   (:use clojure.test
         overtone.live)
-  (:require [oversampler.piano.inst :as inst]
-            [oversampler.piano.synth :as synth]
-            [oversampler.piano.bank :as bank]))
+  (:require [oversampler.freesound.piano.inst :as inst]
+            [oversampler.freesound.piano.synth :as synth]
+            [oversampler.freesound.piano.bank :as bank]))
 
 (println "Setup test piano samples...")
 (time (inst/sampled-piano-init :mf-volume-cutoff 0.75))
@@ -32,5 +32,3 @@
                 good-synth (ask-user-tf (format "Playing piano *synth*\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
             (println cur-pitch-idx cur-level good-inst good-synth)
             (is (and good-inst good-synth))))))))
-  
-

@@ -1,7 +1,7 @@
 ;;
 ;; code describing the sample bank containing the per-note samples.
 ;;
-(ns oversampler.cello.bank
+(ns oversampler.freesound.cello.bank
   (:require [overtone.live :as o]))
 
 ;;(freesound-searchm [:id] "Cello" :f "pack:MIS.Cello2012.Arco.Mono")
@@ -15,7 +15,7 @@
    "Cello.arco.ff.sulG.G3D4.mono.aif"  164126
    "Cello.arco.ff.sulC.C2B2.mono.aif"  164123 ; used
    "Cello.arco.ff.sulC.C2D3.mono.aif"  164122
-   
+
    "Cello.arco.mf.sulA.A3Ab4.mono.aif" 164131 ; used
    "Cello.arco.mf.sulA.A4A5.mono.aif"  164130
    "Cello.arco.mf.sulD.D3Db4.mono.aif" 164137 ; used
@@ -24,7 +24,7 @@
    "Cello.arco.mf.sulG.G3G4.mono.aif"  164143
    "Cello.arco.mf.sulC.C2B2.mono.aif"  164140 ; used
    "Cello.arco.mf.sulC.C3C4.mono.aif"  164139
-   
+
    "Cello.arco.pp.sulA.A3Ab4.mono.aif" 164142 ; used
    "Cello.arco.pp.sulA.A4A5.mono.aif"  164141
    "Cello.arco.pp.sulD.D3Db4.mono.aif" 164134 ; used
@@ -646,7 +646,7 @@
       (let [the-info (get-sample-info i volume)
             the-length (- (:end the-info) (:start the-info))
             the-rate (:rate (:sample the-info))
-            length-in-secs (/ the-length the-rate)] 
+            length-in-secs (/ the-length the-rate)]
         (o/buffer-set! buf (+ offset i) length-in-secs)))))
 
 (defn- fill-buffer-rates
@@ -708,4 +708,3 @@
 (println "sampled-cello: initializing default samples...")
 (time (sampled-cello-init))
 (println "sampled-cello: done.")
-

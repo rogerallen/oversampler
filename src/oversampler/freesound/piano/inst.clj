@@ -3,9 +3,9 @@
 ;; instrument.  Written to allow :mf/MED samples to be used by default
 ;; rather than the :ff/LOUD samples.
 ;;
-(ns oversampler.piano.inst
+(ns oversampler.freesound.piano.inst
   (:require [overtone.live :as o]
-            [oversampler.piano.bank :as bank]))
+            [oversampler.freesound.piano.bank :as bank]))
 
 ;; provide an alias
 (def sampled-piano-init bank/sampled-piano-init)

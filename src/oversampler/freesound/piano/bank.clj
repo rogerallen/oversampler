@@ -1,4 +1,4 @@
-(ns oversampler.piano.bank
+(ns oversampler.freesound.piano.bank
   (:require [overtone.live :as o]))
 
 (def sample-info-list
@@ -271,4 +271,3 @@
 ;; (time (sampled-piano-init :mf-volume-cutoff 0.85))
 (time (sampled-piano-init))
 (println "sampled-piano: done.")
-

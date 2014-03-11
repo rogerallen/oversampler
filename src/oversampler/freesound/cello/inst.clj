@@ -10,10 +10,10 @@
 ;;   (sampled-cello :note 50 :level 0.2) ;; pp sample
 ;;   (sampled-cello :note 50 :level 0.5) ;; mf sample
 ;;   (sampled-cello :note 50 :level 0.9) ;; ff sample
-;;   
-(ns oversampler.cello.inst
+;;
+(ns oversampler.freesound.cello.inst
   (:require [overtone.live :as o]
-            [oversampler.cello.bank :as bank]))
+            [oversampler.freesound.cello.bank :as bank]))
 
 ;; provide an alias
 (def sampled-cello-init bank/sampled-cello-init)

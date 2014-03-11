@@ -15,11 +15,11 @@
 (deftest ^:ektara ektara-test-1
   (testing "test the ektara"
     (println "testing 2 volumes across all notes")
-    (dotimes [l 3]
+    (dotimes [l 2]
       (dotimes [i (inc (- bank/max-index bank/min-index))]
         (let [cur-level (nth [0.5 0.9] l)
               cur-pitch-idx (+ bank/min-index i)
-              _ (demo 4 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
+              _ (demo 2 (pan2 (sin-osc (midicps (+ 12 cur-pitch-idx))) 0.0 cur-level))
               _ (inst/sampled-ektara :note cur-pitch-idx :level cur-level)
               good (ask-user-tf (format "Playing ektara sample + comparison sin-osc\npitch: %d level:%.2f...\nDoes it sound good?" cur-pitch-idx cur-level))]
           (println cur-pitch-idx cur-level good)

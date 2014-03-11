@@ -267,7 +267,7 @@
 
 ;; ======================================================================
 ;; Initializes the piano banks with the default settings
-(println "sampled-piano: initializing default samples...")
+(println "freesound.sampled-piano: initializing default samples...")
 ;; (time (sampled-piano-init :mf-volume-cutoff 0.85))
 (time (sampled-piano-init))
-(println "sampled-piano: done.")
+(println "freesound.sampled-piano: done.")

@@ -705,6 +705,6 @@
 
 ;; ======================================================================
 ;; Initializes the cello banks with the default settings
-(println "sampled-cello: initializing default samples...")
+(println "freesound.sampled-cello: initializing default samples...")
 (time (sampled-cello-init))
-(println "sampled-cello: done.")
+(println "freesound.sampled-cello: done.")

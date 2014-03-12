@@ -32,20 +32,50 @@ out-bus to control where the output of the synth is sent."
    pan     {:default 0.0 :min -1  :max 1   :step 0.01}
    play-buf-action o/FREE
    out-bus 0]
-  (let [ofst (o/index:kr (:id bank/level-to-offset-buffer) (o/floor (* 20 level)))
-        the-sample-id (o/index:kr (:id bank/note-to-sample-id-buffer) (+ ofst note))
+  (let [ofst            (o/index:kr (:id bank/level-to-offset-buffer)
+                                   (o/floor (* bank/level-steps level)))
+        the-sample-id   (o/index:kr (:id bank/note-to-sample-id-buffer) (+ ofst note))
         the-sample-rate (o/index:kr (:id bank/note-to-rate-buffer) (+ ofst note))
-        env (o/env-gen (o/adsr attack decay sustain release level curve)
-                       :gate gate :action o/FREE)
-        the-samples (o/scaled-play-buf 2 the-sample-id
-                                       :rate (* the-sample-rate rate)
-                                       :level 1.0
-                                       :action play-buf-action)]
-    ;; FIXME -- level needs adjustment. Currently 4 coarse levels
-    (o/out out-bus (o/pan2 (* ;level
-                              env the-samples) pan))))
+        env             (o/env-gen (o/adsr attack decay sustain release level curve)
+                                   :gate gate :action o/FREE)
+        the-samples     (o/scaled-play-buf 2 the-sample-id
+                                           :rate (* the-sample-rate rate)
+                                           :level 1.0
+                                           :action play-buf-action)
+        left-samples    (* env (o/select 0 the-samples))
+        right-samples   (* env (o/select 1 the-samples))
+        ;; adjust volume level for pre-adjusted sample volumes
+        adj-level (+ 0.5 (* 0.5 (o/frac (* 4 level))))]
+    (o/out out-bus (o/balance2 left-samples right-samples pan adj-level))))
 
-;; (steinway-grand-piano 58 :level 0.2)
-;; (steinway-grand-piano 59 :level 0.6)
-;; (steinway-grand-piano 60 :level 0.2)
-;; (steinway-grand-piano 61 :level 0.6)
+(comment
+  ;; testing
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 200))
+                         (steinway-grand-piano n :level 0.6)))
+          [60 62 67 72]))
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 500))
+                         (steinway-grand-piano n :level 0.6)))
+          (range 20 109)))
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 500))
+                         (steinway-grand-piano 54 :level n)))
+         [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]))
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 500))
+                         (steinway-grand-piano 60 :level n)))
+          [0.05 0.10]))
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 500))
+                        (steinway-grand-piano 60 :level n)))
+          [0.24 0.26]))
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 500))
+                         (steinway-grand-piano 60 :level n)))
+          [0.49 0.51]))
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 500))
+                         (steinway-grand-piano 60 :level n)))
+         [0.74 0.76]))
+ )

@@ -5,6 +5,7 @@
 (def rate-1 (/ (Math/pow 2 (/ 11 12)) 2)) ;; 0.9438743126816935
 (def rate+1 (Math/pow 2 (/ 1 12)))        ;; 1.0594630943592953
 (def rate+2 (Math/pow 2 (/ 2 12)))        ;; 1.122462048309373
+(def level-steps 20)
 (def sample-info-list
   [
    {:index (dec  21) :rate rate-1 :volume :v2 :path (str root "Steinway V2/Steinway V2  021.aif")}
@@ -466,8 +467,8 @@
   (fill-buffer-rates note-to-rate-buffer 128 :v3)
   (fill-buffer-rates note-to-rate-buffer 256 :v4)
   (fill-buffer-rates note-to-rate-buffer 384 :v5)
-  (dotimes [i 21]
-    (let [cur-offset (min 384 (* 128 (int (* 4 (/ i 20)))))]
+  (dotimes [i (inc level-steps)]
+    (let [cur-offset (min 384 (* 128 (int (* 4 (/ i level-steps)))))]
       (o/buffer-set! level-to-offset-buffer i cur-offset)))
   nil)
 

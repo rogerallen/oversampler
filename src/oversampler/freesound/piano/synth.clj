@@ -40,5 +40,15 @@ where the output of the synth is sent."
         the-samples (o/scaled-play-buf 2 the-sample-id
                                        :rate rate
                                        :level 1.0
-                                       :action play-buf-action)]
-    (o/out out-bus (o/pan2 (* level env the-samples) pan))))
+                                       :action play-buf-action)
+        left-samples    (* env (o/select 0 the-samples))
+        right-samples   (* env (o/select 1 the-samples))]
+    (o/out out-bus (o/balance2 left-samples right-samples pan level))))
+
+(comment
+  ;; testing
+  (dorun (map-indexed
+          (fn [i n] (o/at (+ (o/now) (* i 200))
+                         (sampled-piano n :level 0.6)))
+          [60 62 67 72]))
+  )

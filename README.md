@@ -8,7 +8,12 @@ the [Overtone](http://github.com/overtone/overtone) project.
 Sampled instruments are provided in both definst and defsynth flavors.
 Use whichever one you would like.
 
-### Piano
+### Freesound Samples
+
+Some instruments come from freesound.org and are available to all
+users.
+
+#### Freesound Piano
 
 Uses the same samples that the overtone.inst.sampled-piano uses, but
 allows you to have both loud & medium versions available for a bit
@@ -17,11 +22,11 @@ samples & overtone's uses just the loud (ff) ones.
 
 Basic use via:
 
-    (use 'oversampler.piano.inst) 
+    (use 'oversampler.freesound.piano.inst)
     *OR*
-    (use 'oversampler.piano.synth)
+    (use 'oversampler.freesound.piano.synth)
     (sampled-piano :note 50 :level 0.5)
-    
+
 To get access to 2 sets of samples medium (mf) and loud (ff) you need
 to init to have a cutoff point like:
 
@@ -29,7 +34,7 @@ to init to have a cutoff point like:
     (sampled-piano :note 50 :level 0.5) ;; mf sample
     (sampled-piano :note 50 :level 0.9) ;; ff sample
 
-### Cello
+### Freesound Cello
 
 The sampled-cello is usable at this point, but could use review from
 others for tuning and guidance on the best way to map the samples to
@@ -37,11 +42,11 @@ volumes.
 
 Basic use via:
 
-    (use 'oversampler.cello.inst)
+    (use 'oversampler.freesound.cello.inst)
     ;; *OR*
-    (use 'oversampler.cello.synth)
+    (use 'oversampler.freesound.cello.synth)
     (sampled-cello :note 50 :level 0.5)
-    
+
 There are 3 sets of samples soft (pp), medium (mf) and loud (ff).  By
 default only the mf samples are used.  If you want all 3 sets of
 samples, try something like:
@@ -50,6 +55,23 @@ samples, try something like:
     (sampled-cello :note 50 :level 0.2) ;; pp sample
     (sampled-cello :note 50 :level 0.5) ;; mf sample
     (sampled-cello :note 50 :level 0.9) ;; ff sample
+
+### Garageband Samples
+
+Some instruments use Garageband samples and are available to Mac
+users.
+
+Some instruments use the Garageband Symphonic Jam Pack and are
+available to Mac users who purchased this software.
+
+#### Garageband Steinway Grand Piano
+
+Basic use via:
+
+    (use 'oversampler.garageband.steinway-grand-piano.inst)
+    *OR*
+    (use 'oversampler.garageband.steinway-grand-piano.synth)
+    (steinway-grand-piano :note 50 :level 0.5)
 
 ### Note on/off control
 

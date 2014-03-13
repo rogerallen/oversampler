@@ -6,9 +6,25 @@ Symphonic Jam Pack.
 Garageband samples are stored in `/Library/Application Support/GarageBand/Instrument Library/Sampler/Sampler Files/`
 
 ==Instruments==
+
+===Default Garageband===
+- Steel String Acoustic Guitar
+
+===Symphonic Jam Pack===
 - Steinway Grand Piano
 
-==Potential Instrument List==
+==Potential Instruments==
+
+These samples are available to add.
+
+===Default Garageband===
+- Grand Piano
+- Hip Hop Kit
+- Percussion Kit
+- Rock Kit
+- Upright Jazz Bass
+
+===Symphonic Jam Pack===
 - Basses
 - Bassoon Solo
 - Celesta
@@ -23,25 +39,19 @@ Garageband samples are stored in `/Library/Application Support/GarageBand/Instru
 - Flute ensemble
 - French Horns
 - Glockenspiel
-- Grand Piano
 - Harp
 - Harpsichord
-- Hip Hop Kit
 - Horn Solo
 - Marimba
 - Muted Electric Bass
 - Oboe Solo
 - Orchestral Kit
-- Percussion Kit
 - Piccolo
-- Rock Kit
-- Steel String Acoustic Guitar
 - Timpani
 - Trombones
 - Trumpets
 - Tuba Solo
 - Tubular Bells
-- Upright Jazz Bass
 - Violas
 - Violins 1
 - Violins 2

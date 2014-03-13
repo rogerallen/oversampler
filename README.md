@@ -34,7 +34,7 @@ to init to have a cutoff point like:
     (sampled-piano :note 50 :level 0.5) ;; mf sample
     (sampled-piano :note 50 :level 0.9) ;; ff sample
 
-### Freesound Cello
+#### Freesound Cello
 
 The sampled-cello is usable at this point, but could use review from
 others for tuning and guidance on the best way to map the samples to
@@ -91,9 +91,9 @@ core.clj comments for other things you can do with the code.  It is
 also commented out for normal distribution, since it uses Incanter and
 that's not something normal sample players should need.
 
-## TODO List
+## TODO Ideas
 
-    o cello sounds need review by others for loudness, timing, tuning, etc.
+    o freesound cello sounds need review by others for loudness, timing, tuning, etc.
     o looping
     o needs better docs
     o http://theremin.music.uiowa.edu/MISguitar.html
@@ -101,6 +101,6 @@ that's not something normal sample players should need.
 
 ## License
 
-Copyright © 2012, 2013 Roger Allen
+Copyright © 2012-2014 Roger Allen
 
 Distributed under the Eclipse Public License, the same as Clojure.

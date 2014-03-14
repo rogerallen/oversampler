@@ -61,10 +61,19 @@ samples, try something like:
 Some instruments use Garageband samples and are available to Mac
 users.
 
+#### Garageband Steel String Acoustic Guitar
+
+Basic use via:
+
+    (use 'oversampler.garageband.steel-string-acoustic-guitar.inst)
+    *OR*
+    (use 'oversampler.garageband.steel-string-acoustic-guitar.synth)
+    (steel-string-acoustic-guitar :note 50 :level 0.5)
+
 Some instruments use the Garageband Symphonic Jam Pack and are
 available to Mac users who purchased this software.
 
-#### Garageband Steinway Grand Piano
+#### Garageband Steinway Grand Piano (Requires Jam Pack)
 
 Basic use via:
 

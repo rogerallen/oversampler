@@ -3,9 +3,12 @@
 Overtone Instruments & Synths using Samples from Garageband and
 Symphonic Jam Pack.
 
-Garageband samples are stored in `/Library/Application Support/GarageBand/Instrument Library/Sampler/Sampler Files/`
+Garageband samples are stored in
+`/Library/Application Support/GarageBand/Instrument Library/Sampler/Sampler Files/`
 
 ==Instruments==
+
+These samples are available to use.
 
 ===Default Garageband===
 - Steel String Acoustic Guitar
